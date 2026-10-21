@@ -1,26 +1,57 @@
 @import "tailwindcss";
 
+/* Tokens: ../razzo-strategy/06_medusaas/BRAND.md */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --sunshine: #f7c948;
+  --soft-gold: #ffe89a;
+  --cream: #fff9eb;
+  --surface: #ffffff;
+  --ink: #25231f;
+  --muted: #6b6455;
+  --honey: #8a6100;
+  --success: #1e7a46;
+  --warning: #8a5a00;
+  --danger: #b42318;
+  --line: #efe6cf;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-sunshine: var(--sunshine);
+  --color-soft-gold: var(--soft-gold);
+  --color-cream: var(--cream);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-honey: var(--honey);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-line: var(--line);
+  --font-sans: var(--font-jakarta);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--cream);
+  color: var(--ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .animate-float {
+    animation: float 4s ease-in-out infinite;
+  }
 }
