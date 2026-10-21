@@ -1,34 +1,40 @@
 import Link from "next/link";
-import { Sidebar } from "@/components/Sidebar";
-import { Wordmark } from "@/components/Jellyfish";
-import { user } from "@/lib/mock";
+import { Mavi } from "@/components/Jellyfish";
+import { Shell, type NavItem } from "@/components/Shell";
+import { clientTickets, notifications, user } from "@/lib/mock";
+
+const nav: NavItem[] = [
+  { href: "/app", label: "Home" },
+  { href: "/app/projects", label: "My projects" },
+  {
+    href: "/app/requests",
+    label: "Requests",
+    count: clientTickets.filter((t) => t.status !== "completed").length,
+  },
+  { href: "/app/billing", label: "Billing" },
+  { href: "/app/plan", label: "My plan" },
+  { href: "/app/documents", label: "Documents" },
+  { href: "/app/notifications", label: "Notifications", count: notifications.filter((n) => n.unread).length },
+  { href: "/app/account", label: "My account" },
+];
 
 export default function PortalLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-screen">
-      <Sidebar />
-      <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex items-center justify-between gap-4 px-4 py-4 sm:px-8">
-          <Link href="/app" className="lg:hidden">
-            <Wordmark size={28} />
-          </Link>
-          <div className="ml-auto flex items-center gap-3">
-            <span
-              aria-hidden="true"
-              className="grid h-9 w-9 place-items-center rounded-full bg-ink font-semibold text-cream"
-            >
-              {user.firstName[0]}
-            </span>
-            <span className="hidden text-sm leading-tight sm:block">
-              <span className="block font-semibold">
-                {user.firstName} {user.lastName}
-              </span>
-              <span className="text-muted">{user.role}</span>
-            </span>
-          </div>
-        </header>
-        <main className="flex-1 px-4 pb-10 sm:px-8">{children}</main>
-      </div>
-    </div>
+    <Shell
+      nav={nav}
+      root="/app"
+      user={{ initial: user.firstName[0], name: `${user.firstName} ${user.lastName}`, role: user.org }}
+      footer={
+        <Link href="/app/conversations/new" className="flex items-center gap-3 rounded-2xl bg-cream p-4 text-sm">
+          <Mavi size={36} />
+          <span>
+            <span className="block font-semibold">Need help?</span>
+            <span className="text-muted">Chat with Mavi</span>
+          </span>
+        </Link>
+      }
+    >
+      {children}
+    </Shell>
   );
 }
