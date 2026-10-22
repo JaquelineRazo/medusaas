@@ -55,3 +55,97 @@ body {
     animation: float 4s ease-in-out infinite;
   }
 }
+
+/* Home background (OceanGrid): light moving through water. */
+.ocean {
+  mask-image: linear-gradient(to bottom, #000 0%, #000 60%, transparent 100%);
+}
+
+.ocean-glint {
+  opacity: 0;
+  background: radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.95), rgba(255, 249, 235, 0.5) 60%, transparent);
+}
+
+.ocean-sparkle {
+  opacity: 0;
+  background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.9), transparent 70%);
+}
+
+.ocean-ray {
+  opacity: 0.45;
+  transform-origin: top center;
+  transform: rotate(14deg);
+  filter: blur(28px);
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0) 70%);
+}
+
+.ocean-ray-b {
+  transform: rotate(-8deg);
+  opacity: 0.35;
+}
+
+.ocean-ray-c {
+  transform: rotate(22deg);
+  opacity: 0.3;
+}
+
+@keyframes glint {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  9% {
+    opacity: 0.75;
+  }
+  22% {
+    opacity: 0;
+  }
+}
+
+@keyframes sparkle {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  4% {
+    opacity: 0.9;
+  }
+  10% {
+    opacity: 0;
+  }
+}
+
+@keyframes sway {
+  0%,
+  100% {
+    transform: rotate(var(--ray-from, 14deg));
+    opacity: 0.25;
+  }
+  50% {
+    transform: rotate(var(--ray-to, 6deg));
+    opacity: 0.5;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ocean-glint {
+    animation: glint 11s ease-in-out infinite;
+    animation-delay: var(--glint-delay, 0s);
+  }
+  .ocean-sparkle {
+    animation: sparkle 7s ease-in-out infinite;
+  }
+  .ocean-ray {
+    animation: sway 16s ease-in-out infinite;
+  }
+  .ocean-ray-b {
+    --ray-from: -8deg;
+    --ray-to: 2deg;
+    animation-duration: 21s;
+  }
+  .ocean-ray-c {
+    --ray-from: 22deg;
+    --ray-to: 12deg;
+    animation-duration: 18s;
+  }
+}
