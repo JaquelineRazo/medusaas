@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { Primary } from "@/components/chat";
 import { Mavi, Wordmark } from "@/components/Jellyfish";
+import { OceanGrid } from "@/components/OceanGrid";
 
 // Scripted public intake for the Phase 1 prototype (COPY.md "Public site").
 // The real version (Phase 3) is an LLM with zero privileges: BRIEF.md §1.2.
@@ -96,8 +97,9 @@ export function PublicChat() {
   );
 
   return (
-    <div className="flex h-dvh flex-col">
-      <header className="flex items-center justify-between px-4 py-4 sm:px-8">
+    <div className="relative flex h-dvh flex-col overflow-hidden">
+      <OceanGrid className={started ? "opacity-50" : ""} />
+      <header className="relative flex items-center justify-between px-4 py-4 sm:px-8">
         <Link href="/">
           <Wordmark size={28} />
         </Link>
@@ -107,22 +109,27 @@ export function PublicChat() {
       </header>
 
       {!started ? (
-        <main className="flex flex-1 flex-col items-center justify-center px-4 pb-24">
-          <Mavi size={88} float />
-          <h1 className="mt-5 text-center text-3xl font-bold sm:text-4xl">
+        <main className="relative flex flex-1 flex-col items-center justify-center px-4 pb-24">
+          <h1 className="text-center text-3xl font-bold sm:text-4xl">
             Hi, I&apos;m Mavi. What would you like to build?
           </h1>
           <p className="mt-3 text-center text-muted">
             Tell me in your own words. A person on our team reviews every request.
           </p>
-          <div className="mt-8 w-full max-w-2xl">{composer}</div>
+          <div className="relative mt-32 w-full max-w-2xl">
+            {/* Mavi greets the visitor, then swims round the box inviting them to write. */}
+            <div aria-hidden="true" className={`mavi-swim pointer-events-none absolute z-10 ${draft ? "is-attentive" : ""}`}>
+              <Mavi size={64} className="mavi-glow" />
+            </div>
+            {composer}
+          </div>
           <div className="mt-4 flex max-w-2xl flex-wrap justify-center gap-2">
             {chips.map((c) => (
               <button
                 key={c}
                 type="button"
                 onClick={() => send(c)}
-                className="rounded-full border border-line bg-surface px-4 py-2 text-sm font-medium hover:border-sunshine"
+                className="jelly rounded-full px-4 py-2 text-sm font-medium transition hover:shadow-[0_0_24px_-4px_rgba(247,201,72,0.7)]"
               >
                 {c}
               </button>
@@ -131,7 +138,7 @@ export function PublicChat() {
         </main>
       ) : (
         <>
-          <main className="flex-1 overflow-y-auto px-4" aria-live="polite">
+          <main className="relative flex-1 overflow-y-auto px-4" aria-live="polite">
             <div className="mx-auto max-w-2xl space-y-6 py-6">
               {msgs.map((m, i) =>
                 m.from === "bot" ? (
@@ -150,7 +157,7 @@ export function PublicChat() {
               {step === "contact" && (
                 <form
                   onSubmit={submitContact}
-                  className="ml-11 max-w-sm space-y-3 rounded-3xl border border-line bg-surface p-5"
+                  className="jelly ml-11 max-w-sm space-y-3 rounded-3xl p-5"
                 >
                   <Field label="Name" value={name} onChange={setName} autoComplete="name" />
                   <Field label="Email" type="email" value={email} onChange={setEmail} autoComplete="email" />
@@ -171,12 +178,12 @@ export function PublicChat() {
               <div ref={endRef} />
             </div>
           </main>
-          <div className="px-4 pb-2">
+          <div className="relative px-4 pb-2">
             <div className="mx-auto max-w-2xl">{composer}</div>
           </div>
         </>
       )}
-      <p className="px-4 pb-3 text-center text-xs text-muted">
+      <p className="relative px-4 pb-3 text-center text-xs text-muted">
         Mavi is a virtual assistant. It never sets prices; a person reviews every request.
       </p>
     </div>
@@ -202,7 +209,7 @@ function BigComposer({
         e.preventDefault();
         onSend();
       }}
-      className="rounded-3xl border border-line bg-surface p-3 shadow-[0_12px_40px_-24px_rgba(138,97,0,0.45)] focus-within:border-sunshine"
+      className="jelly glow-within rounded-3xl p-3"
     >
       <label htmlFor="mavi-input" className="sr-only">
         Message to Mavi
@@ -227,7 +234,7 @@ function BigComposer({
         <button
           type="button"
           aria-label="Attach a file"
-          className="grid h-9 w-9 place-items-center rounded-full border border-line text-lg hover:bg-cream"
+          className="grid h-9 w-9 place-items-center rounded-full border border-line bg-white/60 text-lg hover:bg-cream"
         >
           +
         </button>

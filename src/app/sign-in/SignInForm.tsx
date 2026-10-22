@@ -29,7 +29,7 @@ export function SignInForm() {
           autoComplete="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="mt-1 h-11 w-full rounded-xl bg-cream px-3 outline-none"
+          className="mt-1 h-11 w-full rounded-xl border border-line bg-white px-3 outline-none focus:border-ink"
         />
       </label>
       <label className="block text-sm">
@@ -38,7 +38,7 @@ export function SignInForm() {
           type="password"
           required
           autoComplete="current-password"
-          className="mt-1 h-11 w-full rounded-xl bg-cream px-3 outline-none"
+          className="mt-1 h-11 w-full rounded-xl border border-line bg-white px-3 outline-none focus:border-ink"
         />
       </label>
       <button

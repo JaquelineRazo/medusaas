@@ -57,9 +57,18 @@ export function Mavi({
           <stop offset="1" stopColor="#FFE89A" />
         </linearGradient>
       </defs>
+      {/* Class names let a parent animate the arms, eyes and face (see .mavi-swim). */}
       {["M19 33c-3 8 4 13-1 23", "M27 34c-2 9 5 13 0 24", "M37 34c2 9-5 13 0 23", "M45 33c3 8-4 13 1 21"].map(
-        (d) => (
-          <path key={d} d={d} stroke="url(#mavi-arm)" strokeWidth="4.5" strokeLinecap="round" fill="none" />
+        (d, i) => (
+          <path
+            key={d}
+            d={d}
+            className={i === 0 ? "mavi-arm mavi-arm-lead" : i === 3 ? "mavi-arm mavi-arm-tail" : "mavi-arm"}
+            stroke="url(#mavi-arm)"
+            strokeWidth="4.5"
+            strokeLinecap="round"
+            fill="none"
+          />
         ),
       )}
       <path
@@ -67,9 +76,13 @@ export function Mavi({
         fill="url(#mavi-bell)"
       />
       <ellipse cx="22" cy="13" rx="6" ry="3" fill="#FFFFFF" opacity="0.55" transform="rotate(-25 22 13)" />
-      <ellipse cx="26" cy="21" rx="2.2" ry="3.6" fill="#25231F" />
-      <ellipse cx="39" cy="21" rx="2.2" ry="3.6" fill="#25231F" />
-      <path d="M29.5 27c1.6 1.6 4.4 1.6 6 0" stroke="#25231F" strokeWidth="1.8" strokeLinecap="round" fill="none" />
+      <g className="mavi-face">
+        <g className="mavi-eyes">
+          <ellipse cx="26" cy="21" rx="2.2" ry="3.6" fill="#25231F" />
+          <ellipse cx="39" cy="21" rx="2.2" ry="3.6" fill="#25231F" />
+        </g>
+        <path d="M29.5 27c1.6 1.6 4.4 1.6 6 0" stroke="#25231F" strokeWidth="1.8" strokeLinecap="round" fill="none" />
+      </g>
     </svg>
   );
 }
@@ -86,7 +99,7 @@ export function Wordmark({ size = 32, descriptor = false }: { size?: number; des
           <span className="font-extrabold">SAAS</span>
         </span>
         {descriptor && (
-          <span className="mt-1 block text-[10px] font-medium tracking-[0.18em] text-muted uppercase">
+          <span className="mt-1 block text-[10px] font-medium tracking-[0.18em] uppercase opacity-70">
             Software as a Service
           </span>
         )}

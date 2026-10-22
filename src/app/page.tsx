@@ -18,7 +18,7 @@ export default function Landing() {
         <Wordmark descriptor />
         <Link
           href="/sign-in"
-          className="rounded-full border border-ink/15 bg-surface/70 px-4 py-2 text-sm font-semibold backdrop-blur hover:border-ink"
+          className="jelly rounded-full px-4 py-2 text-sm font-semibold transition hover:shadow-[0_0_24px_-4px_rgba(247,201,72,0.7)]"
         >
           Sign in
         </Link>

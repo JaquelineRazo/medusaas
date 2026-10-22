@@ -179,3 +179,315 @@ body {
     animation-duration: 18s;
   }
 }
+
+/* ── Jellyfish language (BRAND.md §Visual metaphors) ─────────────────────────
+   Gelatinous: translucent, soft, with an inner highlight.
+   Luminescent: warm glow instead of hard shadows.
+   Currents: slow drifting motion, never sudden. */
+
+.jelly {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(255, 249, 235, 0.62));
+  backdrop-filter: blur(18px) saturate(1.2);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -14px 32px rgba(255, 232, 154, 0.28),
+    0 22px 50px -30px rgba(138, 97, 0, 0.5);
+}
+
+.glow-within {
+  transition: box-shadow 400ms ease;
+}
+
+.glow-within:focus-within {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    0 0 0 4px rgba(247, 201, 72, 0.22),
+    0 0 56px -8px rgba(247, 201, 72, 0.6);
+}
+
+.mavi-glow {
+  filter: drop-shadow(0 6px 14px rgba(247, 201, 72, 0.55));
+}
+
+/* Mavi swimming around the /talk composer: greets the user, then invites them to write. */
+.mavi-swim {
+  left: calc(50% - 32px);
+  top: -86px;
+}
+
+.mavi-swim .mavi-arm,
+.mavi-swim .mavi-eyes {
+  transform-box: fill-box;
+  transform-origin: top center;
+}
+
+.mavi-swim .mavi-eyes {
+  transform-origin: center;
+}
+
+@keyframes mavi-route {
+  0%,
+  100% {
+    left: 2%;
+    top: -86px;
+    transform: rotate(0deg);
+  }
+  12% {
+    left: 2%;
+    top: -96px;
+    transform: rotate(-3deg);
+  }
+  24% {
+    left: 2%;
+    top: -86px;
+    transform: rotate(0deg);
+  }
+  36% {
+    left: calc(100% - 24px);
+    top: -74px;
+    transform: rotate(9deg);
+  }
+  44%,
+  62% {
+    left: calc(100% + 16px);
+    top: 6px;
+    transform: rotate(-8deg);
+  }
+  74% {
+    left: 46%;
+    top: -92px;
+    transform: rotate(-7deg);
+  }
+  86% {
+    left: 46%;
+    top: -82px;
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes mavi-bob {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(-3deg);
+  }
+}
+
+@keyframes mavi-look {
+  0%,
+  24%,
+  96%,
+  100% {
+    transform: translate(0, 0);
+  }
+  34% {
+    transform: translate(2.5px, 0);
+  }
+  44%,
+  62% {
+    transform: translate(-3.5px, 1.5px);
+  }
+  72% {
+    transform: translate(-2px, 0);
+  }
+  78%,
+  90% {
+    transform: translate(0, 3px);
+  }
+}
+
+/* Lead arm: a hello wave to the user, then "come here" curls towards the box. */
+@keyframes mavi-beckon {
+  0%,
+  4%,
+  17%,
+  44%,
+  64%,
+  76%,
+  92%,
+  100% {
+    transform: rotate(0deg);
+  }
+  7%,
+  13% {
+    transform: rotate(-38deg);
+  }
+  10%,
+  16% {
+    transform: rotate(-12deg);
+  }
+  48%,
+  56% {
+    transform: rotate(38deg);
+  }
+  52%,
+  60% {
+    transform: rotate(6deg);
+  }
+  80%,
+  86% {
+    transform: rotate(28deg);
+  }
+  83%,
+  89% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes mavi-sway-arm {
+  0%,
+  100% {
+    transform: rotate(-6deg);
+  }
+  50% {
+    transform: rotate(6deg);
+  }
+}
+
+@keyframes mavi-blink {
+  0%,
+  46%,
+  50%,
+  100% {
+    transform: scaleY(1);
+  }
+  48% {
+    transform: scaleY(0.12);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .mavi-swim {
+    animation: mavi-bob 3.5s ease-in-out infinite;
+  }
+  .mavi-swim .mavi-arm-lead {
+    animation: mavi-beckon 14s ease-in-out infinite;
+  }
+  .mavi-swim .mavi-arm:not(.mavi-arm-lead) {
+    animation: mavi-sway-arm 2.6s ease-in-out infinite;
+  }
+  .mavi-swim .mavi-arm-tail {
+    animation-delay: -1.3s;
+  }
+  .mavi-swim .mavi-eyes {
+    animation: mavi-blink 5s ease-in-out infinite;
+  }
+  /* The full route needs room on both sides of the composer. */
+  @media (min-width: 900px) {
+    .mavi-swim {
+      animation: mavi-route 14s ease-in-out infinite;
+    }
+    .mavi-swim .mavi-face {
+      animation: mavi-look 14s ease-in-out infinite;
+    }
+  }
+  /* While the person writes, Mavi stops where it is and watches the box. */
+  .mavi-swim.is-attentive,
+  .mavi-swim.is-attentive .mavi-arm-lead {
+    animation-play-state: paused;
+  }
+  .mavi-swim.is-attentive .mavi-face {
+    animation: none;
+    transform: translate(0, 3px);
+  }
+}
+
+/* Sign in: a deep-sea bloom of luminescent jellyfish carried by the current. */
+.deep-sea {
+  background:
+    radial-gradient(ellipse 70% 55% at 70% 10%, rgba(247, 201, 72, 0.16), transparent 70%),
+    radial-gradient(ellipse 60% 50% at 10% 90%, rgba(255, 232, 154, 0.08), transparent 70%),
+    linear-gradient(180deg, #2c2820 0%, #1d1b17 55%, #141310 100%);
+}
+
+.glow-jelly {
+  filter: drop-shadow(0 0 14px rgba(247, 201, 72, 0.55));
+}
+
+.glow-text {
+  text-shadow: 0 0 28px rgba(247, 201, 72, 0.55);
+}
+
+@keyframes rise {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(calc(-100vh - 100%));
+  }
+}
+
+@keyframes current {
+  0%,
+  100% {
+    transform: translateX(-18px) rotate(-5deg);
+  }
+  50% {
+    transform: translateX(22px) rotate(6deg);
+  }
+}
+
+@keyframes pulse-bell {
+  0%,
+  100% {
+    transform: scale(1, 1);
+  }
+  40% {
+    transform: scale(1.06, 0.9);
+  }
+}
+
+@keyframes tentacle {
+  0%,
+  100% {
+    transform: skewX(-6deg);
+  }
+  50% {
+    transform: skewX(6deg);
+  }
+}
+
+@keyframes drift-chip {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(14px, -18px);
+  }
+}
+
+.glow-jelly .bell,
+.glow-jelly .strands,
+.bell-tentacles path {
+  transform-box: fill-box;
+  transform-origin: top center;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .sea-rise {
+    animation: rise var(--dur, 30s) linear infinite;
+    animation-delay: var(--delay, 0s);
+  }
+  .sea-current {
+    animation: current var(--sway, 9s) ease-in-out infinite;
+  }
+  .glow-jelly .bell {
+    animation: pulse-bell 3.2s ease-in-out infinite;
+  }
+  .glow-jelly .strands,
+  .bell-tentacles path {
+    animation: tentacle 3.2s ease-in-out infinite;
+  }
+  .bell-tentacles path:nth-child(even) {
+    animation-delay: -1.6s;
+  }
+  .sea-chip {
+    animation: drift-chip var(--dur, 12s) ease-in-out infinite;
+    animation-delay: var(--delay, 0s);
+  }
+}

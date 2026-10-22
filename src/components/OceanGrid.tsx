@@ -33,9 +33,9 @@ function cellStyle(r: number, c: number): CSSProperties {
   };
 }
 
-export function OceanGrid() {
+export function OceanGrid({ className = "" }: { className?: string }) {
   return (
-    <div aria-hidden="true" className="ocean pointer-events-none absolute inset-0 overflow-hidden">
+    <div aria-hidden="true" className={`ocean pointer-events-none absolute inset-0 overflow-hidden transition-opacity duration-700 ${className}`}>
       <div className="ocean-drift absolute inset-0">
         <div
           className="absolute top-1/2 left-1/2 grid -translate-x-1/2 -translate-y-1/2 gap-1.5"
