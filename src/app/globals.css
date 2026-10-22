@@ -127,7 +127,37 @@ body {
   }
 }
 
+@keyframes swell {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(-14px) scale(0.94);
+    opacity: 0.65;
+  }
+}
+
+@keyframes drift {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(-48px, 10px);
+  }
+}
+
 @media (prefers-reduced-motion: no-preference) {
+  .ocean-cell {
+    animation: swell 7s ease-in-out infinite;
+    animation-delay: var(--swell-delay, 0s);
+    will-change: transform, opacity;
+  }
+  .ocean-drift {
+    animation: drift 24s ease-in-out infinite;
+  }
   .ocean-glint {
     animation: glint 11s ease-in-out infinite;
     animation-delay: var(--glint-delay, 0s);

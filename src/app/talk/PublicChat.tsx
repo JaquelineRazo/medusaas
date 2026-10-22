@@ -38,6 +38,17 @@ export function PublicChat() {
 
   const push = (...m: Msg[]) => setMsgs((prev) => [...prev, ...m]);
 
+  // Home links open the chat with a chip already chosen (?start=). Only chip values are
+  // accepted, so nothing arbitrary can be injected through the URL.
+  const autoStarted = useRef(false);
+  useEffect(() => {
+    if (autoStarted.current) return;
+    autoStarted.current = true;
+    const start = new URLSearchParams(window.location.search).get("start");
+    if (start && chips.includes(start)) queueMicrotask(() => send(start));
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- run once on load
+  }, []);
+
   function send(text: string) {
     const t = text.trim();
     if (!t) return;

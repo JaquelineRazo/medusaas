@@ -2,11 +2,13 @@
 
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 
+type Layer = ReactNode | ((pos: number) => ReactNode);
+
 type Props = {
-  /** Top layer, visible to the left of the handle. */
-  before: ReactNode;
-  /** Bottom layer, visible to the right of the handle. */
-  after: ReactNode;
+  /** Left side; it takes the space up to the handle. */
+  before: Layer;
+  /** Right side; it takes the space after the handle. */
+  after: Layer;
   label: string;
   defaultPosition?: number;
   min?: number;
@@ -19,9 +21,10 @@ type Props = {
 };
 
 /**
- * Two stacked layers split by a draggable handle. Content inside either layer can carry
- * `data-reveal="<0-100>"`: when it receives keyboard focus the handle moves there, so
- * nothing focusable ever sits hidden behind the other layer.
+ * Two sides split by a draggable handle. Each side gets exactly the width up to the
+ * handle, so its content can reflow and reveal more as it grows (pass a function to
+ * read the position). Content can carry `data-reveal="<0-100>"`: when it receives
+ * keyboard focus the handle moves there, so nothing focusable stays hidden.
  */
 export function CompareReveal({
   before,
@@ -42,6 +45,7 @@ export function CompareReveal({
   const sweep = useRef<number | null>(null);
 
   const clamp = (n: number) => Math.min(max, Math.max(min, n));
+  const render = (layer: Layer) => (typeof layer === "function" ? layer(pos) : layer);
 
   function stopSweep() {
     if (sweep.current !== null) cancelAnimationFrame(sweep.current);
@@ -57,7 +61,7 @@ export function CompareReveal({
   useEffect(() => {
     if (!introSweep || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const start = performance.now() + 700;
-    const duration = 1800;
+    const duration = 2200;
     const tick = (now: number) => {
       const t = (now - start) / duration;
       if (t >= 1) {
@@ -66,7 +70,7 @@ export function CompareReveal({
         return;
       }
       // One gentle swing right, then left, then home.
-      if (t > 0) setPos(defaultPosition + Math.sin(t * Math.PI * 2) * 12 * (1 - t * 0.4));
+      if (t > 0) setPos(defaultPosition + Math.sin(t * Math.PI * 2) * 14 * (1 - t * 0.4));
       sweep.current = requestAnimationFrame(tick);
     };
     sweep.current = requestAnimationFrame(tick);
@@ -96,25 +100,21 @@ export function CompareReveal({
     if (target && e.target !== e.currentTarget) interact(Number(target.dataset.reveal));
   }
 
+  const ease = dragging ? "none" : "300ms ease-out";
+
   return (
-    <div
-      ref={box}
-      className={`relative isolate grid select-none ${className}`}
-      style={style}
-      onFocusCapture={onFocusCapture}
-    >
-      <div className="[grid-area:1/1]">{after}</div>
-      <div
-        className={`[grid-area:1/1] ${dragging ? "" : "transition-[clip-path] duration-300 ease-out"}`}
-        style={{ clipPath: `inset(0 ${100 - pos}% 0 0)` }}
-      >
-        {before}
+    <div ref={box} className={`relative isolate select-none ${className}`} style={style} onFocusCapture={onFocusCapture}>
+      <div className="absolute inset-y-0 left-0 overflow-hidden" style={{ width: `${pos}%`, transition: `width ${ease}` }}>
+        {render(before)}
+      </div>
+      <div className="absolute inset-y-0 right-0 overflow-hidden" style={{ width: `${100 - pos}%`, transition: `width ${ease}` }}>
+        {render(after)}
       </div>
 
       {/* Divider + handle. The wide transparent strip makes the line easy to grab. */}
       <div
         className="absolute inset-y-0 z-10 w-10 -translate-x-1/2 cursor-ew-resize touch-none"
-        style={{ left: `${pos}%`, transition: dragging ? "none" : "left 300ms ease-out" }}
+        style={{ left: `${pos}%`, transition: `left ${ease}` }}
         onPointerDown={(e) => {
           e.currentTarget.setPointerCapture(e.pointerId);
           setDragging(true);
