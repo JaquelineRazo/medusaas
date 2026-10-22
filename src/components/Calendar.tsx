@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { eventTypeLabel, today, type CalEvent, type EventType } from "@/lib/mock";
+import { eventTypeLabel, type CalEvent, type EventType } from "@/lib/calendar";
+import { tzLabel } from "@/lib/format";
 
 // Dots only, never text colour (BRAND.md). Labels always travel with them.
 const dot: Record<EventType, string> = {
@@ -32,29 +33,28 @@ function longDate(date: string) {
   return new Date(y, m - 1, d).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
 }
 
-function timeRange(e: CalEvent) {
+function timeRange(e: CalEvent, tz: string) {
   if (!e.time) return "All day";
   const [h, min] = e.time.split(":").map(Number);
   const end = h * 60 + min + (e.minutes ?? 30);
   const fmt = (t: number) => `${Math.floor(t / 60)}:${String(t % 60).padStart(2, "0")}`;
-  return `${fmt(h * 60 + min)}–${fmt(end)} CDMX`;
+  return `${fmt(h * 60 + min)}–${fmt(end)} ${tzLabel(tz)}`;
 }
 
 // A small .ics so a call lands in the person's own calendar (Google, Outlook, Apple).
+// Times go in UTC, so every calendar app converts them to the person's own zone.
 function downloadIcs(e: CalEvent) {
-  const stamp = (date: string, time: string, add = 0) => {
-    const [h, m] = time.split(":").map(Number);
-    const t = h * 60 + m + add;
-    return `${date.replaceAll("-", "")}T${String(Math.floor(t / 60)).padStart(2, "0")}${String(t % 60).padStart(2, "0")}00`;
-  };
+  const utc = (iso: string, addMin = 0) =>
+    new Date(Date.parse(iso) + addMin * 60_000).toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
   const ics = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
     "PRODID:-//meduSAAS//Calendar//EN",
     "BEGIN:VEVENT",
     `UID:${e.id}@medusaas`,
-    `DTSTART;TZID=America/Mexico_City:${stamp(e.date, e.time!)}`,
-    `DTEND;TZID=America/Mexico_City:${stamp(e.date, e.time!, e.minutes ?? 30)}`,
+    `DTSTAMP:${utc(new Date().toISOString())}`,
+    `DTSTART:${utc(e.startsAt!)}`,
+    `DTEND:${utc(e.startsAt!, e.minutes ?? 30)}`,
     `SUMMARY:${e.title} · meduSAAS`,
     `LOCATION:${e.where ?? ""}`,
     "END:VEVENT",
@@ -67,8 +67,8 @@ function downloadIcs(e: CalEvent) {
   URL.revokeObjectURL(a.href);
 }
 
-export function Calendar({ events, mode }: { events: CalEvent[]; mode: "client" | "admin" }) {
-  const [month, setMonth] = useState({ y: 2026, m: 9 });
+export function Calendar({ events, mode, today, tz }: { events: CalEvent[]; mode: "client" | "admin"; today: string; tz: string }) {
+  const [month, setMonth] = useState(() => ({ y: Number(today.slice(0, 4)), m: Number(today.slice(5, 7)) - 1 }));
   const [filter, setFilter] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
 
@@ -211,7 +211,7 @@ export function Calendar({ events, mode }: { events: CalEvent[]; mode: "client" 
                     <span className={`mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full ${dot[e.type]}`} aria-hidden="true" />
                     <div className="min-w-0 flex-1">
                       <p className="text-xs text-muted">
-                        {eventTypeLabel[e.type]} · {longDate(e.date)} · {timeRange(e)}
+                        {eventTypeLabel[e.type]} · {longDate(e.date)} · {timeRange(e, tz)}
                       </p>
                       <p className="mt-0.5 font-semibold">{e.title}</p>
                       <p className="text-sm text-muted">
@@ -224,7 +224,7 @@ export function Calendar({ events, mode }: { events: CalEvent[]; mode: "client" 
                         {e.project}
                       </p>
                       <div className="mt-3 flex flex-wrap gap-2">
-                        {e.type === "call" && e.date >= today && (
+                        {e.type === "call" && e.date >= today && e.startsAt && e.time && (
                           <>
                             <button
                               type="button"
@@ -233,7 +233,7 @@ export function Calendar({ events, mode }: { events: CalEvent[]; mode: "client" 
                             >
                               Add to my calendar
                             </button>
-                            <span className="self-center text-xs text-muted">{e.where} link arrives by email</span>
+                            {e.where && <span className="self-center text-xs text-muted">{e.where}</span>}
                           </>
                         )}
                         {e.href && mode === "client" && (

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { signOut } from "@/app/auth/actions";
 import { Wordmark } from "./Jellyfish";
 import { NotificationBell, type Notice } from "./NotificationBell";
 
@@ -93,9 +94,11 @@ export function Shell({
                 <span className="block font-semibold">{user.name}</span>
                 <span className="opacity-65">{user.role}</span>
               </span>
-              <Link href="/" className="ml-2 text-sm opacity-65 hover:opacity-100">
-                Sign out
-              </Link>
+              <form action={signOut}>
+                <button type="submit" className="ml-2 text-sm opacity-65 hover:opacity-100">
+                  Sign out
+                </button>
+              </form>
             </div>
           </header>
           <nav className="flex gap-1 overflow-x-auto px-4 pb-3 lg:hidden" aria-label="Sections">
