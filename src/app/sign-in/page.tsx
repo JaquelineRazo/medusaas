@@ -25,14 +25,13 @@ export default function SignIn() {
       <main className="relative mx-auto grid w-full max-w-6xl items-center gap-12 px-4 pt-6 pb-24 sm:px-8 lg:min-h-[calc(100vh-6rem)] lg:grid-cols-[1.15fr_1fr] lg:gap-16 lg:pb-32">
         {/* Text sits low and to the left, the card floats higher on the right. */}
         <section className="lg:translate-y-10">
-          <p className="inline-flex items-center gap-2 rounded-full border border-cream/15 bg-cream/5 px-3 py-1 text-xs font-semibold tracking-[0.18em] text-soft-gold uppercase backdrop-blur">
-            <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-sunshine shadow-[0_0_10px_2px_rgba(247,201,72,0.8)]" />
+          <p className="inline-flex items-center rounded-full border border-cream/15 bg-cream/5 px-3 py-1 text-xs font-semibold tracking-[0.18em] text-soft-gold uppercase backdrop-blur">
             Welcome back
           </p>
           <h1 className="mt-6 text-5xl leading-[1.02] font-bold tracking-tight sm:text-6xl lg:text-7xl">
             Good to see you
             <br />
-            back in the <span className="glow-text text-soft-gold">bloom.</span>
+            back in the <span className="font-accent text-[1.15em] font-normal tracking-normal text-soft-gold italic">bloom.</span>
           </h1>
           <p className="mt-6 max-w-md text-lg text-cream/75">
             A group of jellyfish is called a bloom, and you&apos;re part of ours. Everything you

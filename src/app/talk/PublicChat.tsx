@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { Primary } from "@/components/chat";
 import { Mavi, Wordmark } from "@/components/Jellyfish";
-import { OceanGrid } from "@/components/OceanGrid";
+import { DeepSea } from "@/components/DeepSea";
 
 // Scripted public intake for the Phase 1 prototype (COPY.md "Public site").
 // The real version (Phase 3) is an LLM with zero privileges: BRIEF.md §1.2.
@@ -97,23 +97,24 @@ export function PublicChat() {
   );
 
   return (
-    <div className="relative flex h-dvh flex-col overflow-hidden">
-      <OceanGrid className={started ? "opacity-50" : ""} />
+    <div className="relative flex h-dvh flex-col overflow-hidden bg-[#1d1b17] text-cream">
+      <DeepSea moments={false} className={started ? "opacity-50" : ""} />
       <header className="relative flex items-center justify-between px-4 py-4 sm:px-8">
         <Link href="/">
           <Wordmark size={28} />
         </Link>
-        <Link href="/sign-in" className="text-sm font-semibold hover:text-honey">
+        <Link href="/sign-in" className="text-sm font-semibold text-cream/80 hover:text-soft-gold">
           Client sign in
         </Link>
       </header>
 
       {!started ? (
         <main className="relative flex flex-1 flex-col items-center justify-center px-4 pb-24">
-          <h1 className="text-center text-3xl font-bold sm:text-4xl">
-            Hi, I&apos;m Mavi. What would you like to build?
+          <h1 className="text-center text-3xl font-bold tracking-tight sm:text-5xl">
+            Hi, I&apos;m Mavi. What would you like to{" "}
+            <span className="font-accent text-[1.15em] font-normal tracking-normal text-soft-gold italic">build?</span>
           </h1>
-          <p className="mt-3 text-center text-muted">
+          <p className="mt-3 text-center text-cream/75">
             Tell me in your own words. A person on our team reviews every request.
           </p>
           <div className="relative mt-32 w-full max-w-2xl">
@@ -129,7 +130,7 @@ export function PublicChat() {
                 key={c}
                 type="button"
                 onClick={() => send(c)}
-                className="jelly rounded-full px-4 py-2 text-sm font-medium transition hover:shadow-[0_0_24px_-4px_rgba(247,201,72,0.7)]"
+                className="rounded-full border border-cream/15 bg-cream/5 px-4 py-2 text-sm font-medium backdrop-blur transition hover:border-soft-gold"
               >
                 {c}
               </button>
@@ -144,11 +145,11 @@ export function PublicChat() {
                 m.from === "bot" ? (
                   <div key={i} className="flex gap-3">
                     <Mavi size={30} className="mt-0.5 shrink-0" />
-                    <p className="leading-relaxed">{m.text}</p>
+                    <p className="leading-relaxed text-cream/90">{m.text}</p>
                   </div>
                 ) : (
                   <div key={i} className="flex justify-end">
-                    <p className="max-w-[80%] rounded-3xl bg-soft-gold px-5 py-3 leading-relaxed">
+                    <p className="max-w-[80%] rounded-3xl bg-soft-gold px-5 py-3 leading-relaxed text-ink">
                       {m.text}
                     </p>
                   </div>
@@ -157,7 +158,7 @@ export function PublicChat() {
               {step === "contact" && (
                 <form
                   onSubmit={submitContact}
-                  className="jelly ml-11 max-w-sm space-y-3 rounded-3xl p-5"
+                  className="ml-11 max-w-sm space-y-3 rounded-3xl bg-[linear-gradient(180deg,rgba(255,249,235,0.97),rgba(255,243,210,0.94))] text-ink shadow-[0_0_0_1px_rgba(255,232,154,0.55),0_0_70px_-16px_rgba(247,201,72,0.5)] p-5"
                 >
                   <Field label="Name" value={name} onChange={setName} autoComplete="name" />
                   <Field label="Email" type="email" value={email} onChange={setEmail} autoComplete="email" />
@@ -168,9 +169,9 @@ export function PublicChat() {
                 </form>
               )}
               {step === "done" && (
-                <p className="ml-11 text-sm text-muted">
+                <p className="ml-11 text-sm text-cream/70">
                   Already a client?{" "}
-                  <Link href="/sign-in" className="font-medium text-honey underline">
+                  <Link href="/sign-in" className="font-medium text-soft-gold underline">
                     Sign in to your workspace
                   </Link>
                 </p>
@@ -183,7 +184,7 @@ export function PublicChat() {
           </div>
         </>
       )}
-      <p className="relative px-4 pb-3 text-center text-xs text-muted">
+      <p className="relative px-4 pb-3 text-center text-xs text-cream/60">
         Mavi is a virtual assistant. It never sets prices; a person reviews every request.
       </p>
     </div>
@@ -209,7 +210,7 @@ function BigComposer({
         e.preventDefault();
         onSend();
       }}
-      className="jelly glow-within rounded-3xl p-3"
+      className="glow-within rounded-3xl bg-[linear-gradient(180deg,rgba(255,249,235,0.97),rgba(255,243,210,0.94))] text-ink shadow-[0_0_0_1px_rgba(255,232,154,0.55),0_0_70px_-16px_rgba(247,201,72,0.5)] p-3"
     >
       <label htmlFor="mavi-input" className="sr-only">
         Message to Mavi
@@ -273,7 +274,7 @@ function Field({
         value={value}
         autoComplete={autoComplete}
         onChange={(e) => onChange(e.target.value)}
-        className="mt-1 h-10 w-full rounded-xl bg-cream px-3 outline-none"
+        className="mt-1 h-10 w-full rounded-xl border border-line bg-white px-3 outline-none focus:border-ink"
       />
     </label>
   );

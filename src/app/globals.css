@@ -28,6 +28,7 @@
   --color-danger: var(--danger);
   --color-line: var(--line);
   --font-sans: var(--font-jakarta);
+  --font-accent: var(--font-accent);
 }
 
 body {
@@ -234,33 +235,33 @@ body {
     top: -86px;
     transform: rotate(0deg);
   }
-  12% {
+  6% {
     left: 2%;
     top: -96px;
     transform: rotate(-3deg);
   }
-  24% {
+  13% {
     left: 2%;
     top: -86px;
     transform: rotate(0deg);
   }
-  36% {
+  26% {
     left: calc(100% - 24px);
     top: -74px;
     transform: rotate(9deg);
   }
-  44%,
-  62% {
+  34%,
+  54% {
     left: calc(100% + 16px);
     top: 6px;
     transform: rotate(-8deg);
   }
-  74% {
+  66% {
     left: 46%;
     top: -92px;
     transform: rotate(-7deg);
   }
-  86% {
+  80% {
     left: 46%;
     top: -82px;
     transform: rotate(0deg);
@@ -279,23 +280,23 @@ body {
 
 @keyframes mavi-look {
   0%,
-  24%,
+  13%,
   96%,
   100% {
     transform: translate(0, 0);
   }
-  34% {
+  22% {
     transform: translate(2.5px, 0);
   }
-  44%,
-  62% {
+  34%,
+  54% {
     transform: translate(-3.5px, 1.5px);
   }
-  72% {
+  62% {
     transform: translate(-2px, 0);
   }
-  78%,
-  90% {
+  68%,
+  82% {
     transform: translate(0, 3px);
   }
 }
@@ -303,37 +304,37 @@ body {
 /* Lead arm: a hello wave to the user, then "come here" curls towards the box. */
 @keyframes mavi-beckon {
   0%,
-  4%,
-  17%,
-  44%,
-  64%,
-  76%,
-  92%,
+  2%,
+  12%,
+  34%,
+  54%,
+  68%,
+  84%,
   100% {
     transform: rotate(0deg);
   }
-  7%,
-  13% {
+  4%,
+  9% {
     transform: rotate(-38deg);
   }
-  10%,
-  16% {
+  6.5%,
+  11% {
     transform: rotate(-12deg);
   }
-  48%,
-  56% {
+  38%,
+  46% {
     transform: rotate(38deg);
   }
-  52%,
-  60% {
+  42%,
+  50% {
     transform: rotate(6deg);
   }
-  80%,
-  86% {
+  72%,
+  78% {
     transform: rotate(28deg);
   }
-  83%,
-  89% {
+  75%,
+  81% {
     transform: rotate(0deg);
   }
 }
@@ -365,7 +366,7 @@ body {
     animation: mavi-bob 3.5s ease-in-out infinite;
   }
   .mavi-swim .mavi-arm-lead {
-    animation: mavi-beckon 14s ease-in-out infinite;
+    animation: mavi-beckon 9s ease-in-out infinite;
   }
   .mavi-swim .mavi-arm:not(.mavi-arm-lead) {
     animation: mavi-sway-arm 2.6s ease-in-out infinite;
@@ -379,10 +380,10 @@ body {
   /* The full route needs room on both sides of the composer. */
   @media (min-width: 900px) {
     .mavi-swim {
-      animation: mavi-route 14s ease-in-out infinite;
+      animation: mavi-route 9s ease-in-out infinite;
     }
     .mavi-swim .mavi-face {
-      animation: mavi-look 14s ease-in-out infinite;
+      animation: mavi-look 9s ease-in-out infinite;
     }
   }
   /* While the person writes, Mavi stops where it is and watches the box. */
@@ -406,10 +407,6 @@ body {
 
 .glow-jelly {
   filter: drop-shadow(0 0 14px rgba(247, 201, 72, 0.55));
-}
-
-.glow-text {
-  text-shadow: 0 0 28px rgba(247, 201, 72, 0.55);
 }
 
 @keyframes rise {

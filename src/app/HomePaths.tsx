@@ -98,7 +98,7 @@ export function HomePaths() {
     <>
       {/* Desktop: one card, two paths. Dragging opens each path's options next to the handle. */}
       <CompareReveal
-        className="mt-12 hidden h-[24rem] w-full overflow-hidden rounded-[2rem] border border-line text-left shadow-[0_24px_60px_-30px_rgba(37,35,31,0.35)] lg:block"
+        className="mt-12 hidden h-[24rem] w-full overflow-hidden rounded-[2rem] border border-cream/15 text-left shadow-[0_0_90px_-20px_rgba(247,201,72,0.4)] lg:block"
         label="Compare the two ways to start"
         min={22}
         max={78}
@@ -108,7 +108,7 @@ export function HomePaths() {
           const t = progress(pos, 55, 70);
           const fade = 1 - progress(pos, 42, 32); // the title steps back when the other side opens
           return (
-            <div className="flex h-full items-center gap-10 bg-ink py-8 pr-16 pl-10 text-cream">
+            <div className="flex h-full items-center gap-10 bg-cream/[0.06] text-cream backdrop-blur-xl py-8 pr-16 pl-10">
               <div data-reveal="50" className="flex w-60 shrink-0 flex-col items-start" style={{ opacity: fade }}>
                 <ClientTitle />
               </div>
@@ -126,7 +126,7 @@ export function HomePaths() {
           const t = progress(pos, 45, 30);
           const fade = 1 - progress(pos, 58, 68);
           return (
-            <div className="flex h-full items-center justify-end gap-10 bg-surface py-8 pr-10 pl-16">
+            <div className="flex h-full items-center justify-end gap-10 bg-[linear-gradient(180deg,rgba(255,249,235,0.97),rgba(255,243,210,0.94))] text-ink py-8 pr-10 pl-16">
               <div
                 data-reveal="22"
                 className="min-w-0 flex-1"
@@ -144,13 +144,13 @@ export function HomePaths() {
 
       {/* Mobile and tablet: the same content stacked, nothing hidden. */}
       <div className="mt-10 grid w-full gap-4 text-left md:grid-cols-2 lg:hidden">
-        <section className="flex flex-col items-start rounded-3xl bg-ink p-6 text-cream">
+        <section className="flex flex-col items-start rounded-3xl border border-cream/15 bg-cream/[0.06] text-cream backdrop-blur-xl p-6">
           <ClientTitle />
           <div className="mt-6 w-full">
             <ClientBoxes />
           </div>
         </section>
-        <section className="flex flex-col items-start rounded-3xl border border-line bg-surface p-6">
+        <section className="flex flex-col items-start rounded-3xl bg-[linear-gradient(180deg,rgba(255,249,235,0.97),rgba(255,243,210,0.94))] text-ink p-6">
           <NewTitle />
           <div className="mt-6 w-full">
             <NewBoxes />

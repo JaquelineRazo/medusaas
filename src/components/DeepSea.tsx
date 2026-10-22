@@ -67,9 +67,9 @@ export function GlowJelly({ size }: { size: number }) {
   );
 }
 
-export function DeepSea() {
+export function DeepSea({ moments: showMoments = true, className = "" }: { moments?: boolean; className?: string }) {
   return (
-    <div aria-hidden="true" className="deep-sea pointer-events-none absolute inset-0 overflow-hidden">
+    <div aria-hidden="true" className={`deep-sea pointer-events-none absolute inset-0 overflow-hidden transition-opacity duration-700 ${className}`}>
       {/* Marine snow */}
       {Array.from({ length: 36 }, (_, i) => (
         <span
@@ -108,7 +108,7 @@ export function DeepSea() {
         </div>
       ))}
 
-      {moments.map((m, i) => (
+      {showMoments && moments.map((m, i) => (
         <span
           key={m.text}
           className="sea-chip absolute hidden rounded-full border border-cream/15 bg-cream/[0.07] px-3 py-1.5 text-xs whitespace-nowrap text-cream/75 backdrop-blur-sm lg:block"
