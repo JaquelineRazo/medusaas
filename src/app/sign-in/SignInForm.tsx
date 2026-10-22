@@ -47,9 +47,6 @@ export function SignInForm() {
       >
         Sign in
       </button>
-      <p className="text-xs text-muted italic">
-        Prototype: any email works. Emails at razzobusiness.com open the Admin Workspace.
-      </p>
     </form>
   );
 }

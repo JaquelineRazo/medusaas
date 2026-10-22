@@ -1,21 +1,26 @@
 import Link from "next/link";
 import { Mavi } from "@/components/Jellyfish";
 import { StatusBadge } from "@/components/StatusBadge";
-import { activity, plan, projects, user } from "@/lib/mock";
+import { activity, events, plan, projects, today, user } from "@/lib/mock";
 
 export default function ClientHome() {
   const used = Math.round(((plan.totalDays - plan.daysLeft) / plan.totalDays) * 100);
+  const nextCall = events
+    .filter((e) => e.clientId === "tusitio" && e.type === "call" && e.date >= today)
+    .sort((a, b) => a.date.localeCompare(b.date))[0];
   return (
     <div className="mx-auto max-w-5xl">
-      <h1 className="text-3xl font-bold">Hi, {user.firstName} 👋</h1>
+      <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+        Hi, <span className="font-accent text-[1.15em] font-normal tracking-normal italic">{user.firstName}</span>
+      </h1>
       <p className="mt-1 text-muted">
         Everything in one place. Tell us what you need and we&apos;ll take care of it.
       </p>
 
       <section className="mt-6 grid gap-4 md:grid-cols-[1.3fr_1fr_0.8fr]">
-        <div className="flex flex-col gap-4 rounded-3xl bg-ink p-6 text-cream">
+        <div className="deep-flat flex flex-col gap-4 rounded-3xl p-6 text-cream">
           <div className="flex items-center gap-3">
-            <Mavi size={44} float />
+            <Mavi size={44} />
             <h2 className="text-lg font-semibold">Send a request</h2>
           </div>
           <p className="text-sm text-cream/80">
@@ -54,6 +59,22 @@ export default function ClientHome() {
           </Link>
         </div>
       </section>
+
+      {nextCall && (
+        <Link
+          href="/app/calendar"
+          className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 rounded-3xl border border-line bg-surface px-6 py-4 hover:border-ink"
+        >
+          <span aria-hidden="true" className="h-2.5 w-2.5 rounded-full bg-sunshine" />
+          <span className="text-sm text-muted">Next call</span>
+          <span className="font-semibold">{nextCall.title}</span>
+          <span className="text-sm text-muted">
+            {new Date(`${nextCall.date}T12:00`).toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" })} ·{" "}
+            {nextCall.time} CDMX · {nextCall.where}
+          </span>
+          <span className="ml-auto text-sm font-medium text-honey">See calendar →</span>
+        </Link>
+      )}
 
       <section className="mt-8">
         <div className="mb-3 flex items-center justify-between">

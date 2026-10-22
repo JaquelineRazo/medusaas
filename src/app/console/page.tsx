@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { PageHeader, Panel, Pill, Stat, money } from "@/components/ui";
-import { assets, clients, leads, revenue, statusLabel, tickets, type TicketStatus } from "@/lib/mock";
+import { assets, clients, events, eventTypeLabel, leads, revenue, statusLabel, tickets, today, type TicketStatus } from "@/lib/mock";
 
 type Attention = { tone: "danger" | "warning" | "gold"; text: string; href: string; cta: string };
 
@@ -30,12 +30,16 @@ const flow: TicketStatus[] = ["evaluating", "quote_ready", "awaiting_payment", "
 export default function MissionControl() {
   const items = needsAttention();
   const open = tickets.filter((t) => t.status !== "completed");
+  const weekEnd = "2026-10-29";
+  const week = events
+    .filter((e) => e.date >= today && e.date <= weekEnd)
+    .sort((a, b) => (a.date + (a.time ?? "")).localeCompare(b.date + (b.time ?? "")));
   return (
     <div className="mx-auto max-w-6xl">
       <PageHeader title="Mission Control" subtitle="What needs your attention today." />
 
       <div className="grid gap-4 lg:grid-cols-[1.5fr_1fr]">
-        <section className="rounded-3xl bg-ink p-6 text-cream">
+        <section className="deep-flat rounded-3xl p-6 text-cream">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="font-semibold">Needs attention</h2>
             <span className="rounded-full bg-sunshine px-3 py-0.5 text-sm font-bold text-ink">{items.length}</span>
@@ -68,6 +72,27 @@ export default function MissionControl() {
           <Stat label="Active clients" value={String(clients.length)} hint={`MRR ${money(revenue.mrr)}`} />
         </div>
       </div>
+
+      <Panel
+        title="Next 7 days"
+        className="mt-4"
+        action={<Link href="/console/calendar" className="text-sm font-medium text-honey">Calendar →</Link>}
+      >
+        <ul className="divide-y divide-line">
+          {week.map((e) => (
+            <li key={e.id} className="flex flex-wrap items-center gap-x-4 gap-y-1 py-3 text-sm">
+              <span className="w-24 shrink-0 font-medium">
+                {new Date(`${e.date}T12:00`).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
+              </span>
+              <span className="w-12 shrink-0 text-muted">{e.time ?? "—"}</span>
+              <span className="min-w-0 flex-1">
+                {e.title} · <span className="text-muted">{e.client}</span>
+              </span>
+              <Pill tone={e.type === "call" ? "gold" : "neutral"}>{eventTypeLabel[e.type]}</Pill>
+            </li>
+          ))}
+        </ul>
+      </Panel>
 
       <Panel title="Request-to-revenue flow" className="mt-4">
         <div className="grid gap-3 sm:grid-cols-5">

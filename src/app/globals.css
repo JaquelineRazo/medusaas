@@ -488,3 +488,15 @@ body {
     animation-delay: var(--delay, 0s);
   }
 }
+
+/* Portal/Admin: the same deep sea, flat and without glow. */
+.deep-flat {
+  background: linear-gradient(180deg, #2c2820 0%, #1d1b17 100%);
+}
+
+/* Portal/Admin top band: deep sea on small screens (no sidebar), plain on desktop. */
+@media (max-width: 1023px) {
+  .shell-band {
+    background: linear-gradient(180deg, #2c2820 0%, #1d1b17 100%);
+  }
+}

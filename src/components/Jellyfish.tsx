@@ -1,15 +1,33 @@
 // Provisional SVGs traced from the creative board (BRAND.md) until final vectors exist.
 
-// Outline isotype used in the logo lockup.
-export function LogoMark({ size = 32 }: { size?: number }) {
+// Gradients shared by every logo and Mavi, rendered once in the root layout. Keeping them
+// out of each icon avoids broken fills when the first copy sits in a hidden element.
+export function BrandDefs() {
   return (
-    <svg width={size} height={size} viewBox="0 0 64 64" aria-hidden="true">
+    <svg width="0" height="0" aria-hidden="true" className="absolute">
       <defs>
         <linearGradient id="lm-fill" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stopColor="#FFF9EB" />
           <stop offset="1" stopColor="#FFE89A" />
         </linearGradient>
+        <radialGradient id="mavi-bell" cx="0.4" cy="0.3" r="0.8">
+          <stop offset="0" stopColor="#FFF4C7" />
+          <stop offset="0.55" stopColor="#FFDD6E" />
+          <stop offset="1" stopColor="#F2B83A" />
+        </radialGradient>
+        <linearGradient id="mavi-arm" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#F7C948" />
+          <stop offset="1" stopColor="#FFE89A" />
+        </linearGradient>
       </defs>
+    </svg>
+  );
+}
+
+// Outline isotype used in the logo lockup.
+export function LogoMark({ size = 32 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 64 64" aria-hidden="true">
       <path
         d="M13 30C13 16 21.5 7 32 7s19 9 19 23c0 3-1.8 4.5-4.5 4.5h-29C15 34.5 13 33 13 30Z"
         fill="url(#lm-fill)"
@@ -46,17 +64,6 @@ export function Mavi({
       aria-hidden="true"
       className={`${float ? "animate-float" : ""} ${className}`}
     >
-      <defs>
-        <radialGradient id="mavi-bell" cx="0.4" cy="0.3" r="0.8">
-          <stop offset="0" stopColor="#FFF4C7" />
-          <stop offset="0.55" stopColor="#FFDD6E" />
-          <stop offset="1" stopColor="#F2B83A" />
-        </radialGradient>
-        <linearGradient id="mavi-arm" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#F7C948" />
-          <stop offset="1" stopColor="#FFE89A" />
-        </linearGradient>
-      </defs>
       {/* Class names let a parent animate the arms, eyes and face (see .mavi-swim). */}
       {["M19 33c-3 8 4 13-1 23", "M27 34c-2 9 5 13 0 24", "M37 34c2 9-5 13 0 23", "M45 33c3 8-4 13 1 21"].map(
         (d, i) => (

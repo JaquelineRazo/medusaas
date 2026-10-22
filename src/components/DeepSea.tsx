@@ -28,8 +28,8 @@ const bloom = [
 // Moments a client recognises from their own workspace.
 const moments = [
   { text: "✓ Payment confirmed", top: 13, left: 42 },
-  { text: "Request MS-1042 · Delivered", top: 80, left: 6 },
-  { text: "Your site is online · 99.98%", top: 91, left: 30 },
+  { text: "Request MS-1042 · Delivered", top: 92, left: 60 },
+  { text: "Your site is online · 99.98%", top: 90, left: 22 },
   { text: "New update from your team", top: 15, left: 70 },
   { text: "Quote approved", top: 58, left: 1.5 },
 ];

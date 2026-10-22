@@ -24,7 +24,7 @@ export type Venture = "ORNIVA" | "VARKORA" | "CYRANTA";
 
 // ---------- Client portal (signed in as Ana, org "Tusitio") ----------
 
-export const user = { firstName: "Ana", lastName: "López", role: "Client", org: "Tusitio" };
+export const user = { firstName: "Ana", lastName: "López", role: "Client", org: "Tusitio", email: "ana@tusitio.mx" };
 
 export const plan = {
   name: "Included support",
@@ -195,6 +195,7 @@ export const documents = [
   { name: "Campaign landing · Brief", type: "PDF", date: "Oct 8, 2026" },
 ];
 
+// Every notification is also emailed to the account address (preferences in /app/notifications).
 export const notifications = [
   { text: "Your quote for “Add a testimonials section” is ready.", when: "Oct 20, 2026", unread: true },
   { text: "Ticket MS-1038 was completed. Take a look at your site.", when: "Oct 20, 2026", unread: true },
@@ -366,4 +367,58 @@ export const automations = [
   { name: "Included support expiring", trigger: "coverage ends in 14 / 7 / 1 days", action: "Email with plan options", on: true },
   { name: "Site down alert", trigger: "monitor.incident_opened", action: "Notify admin + create ticket", on: false },
   { name: "Feedback after closing", trigger: "ticket.closed", action: "One-question satisfaction survey", on: false },
+];
+
+// Admin Workspace bell. Also emailed to the staff address.
+export const adminNotifications = [
+  { text: "New lead from Mavi: Lumen Analytics wants a data dashboard.", when: "Today, 9:12 AM", unread: true },
+  { text: "Tusitio approved the quote for MS-1040 and paid the 50% deposit.", when: "Yesterday, 6:40 PM", unread: true },
+  { text: "casaverde.mx SSL certificate renews in 9 days.", when: "Oct 21, 2026", unread: false },
+];
+
+// Calendar: key dates shared with clients (calls, milestones, payments, coverage) plus
+// staff-only ones (renewals). Prototype "today" is Oct 22, 2026.
+export type EventType = "call" | "milestone" | "delivery" | "payment" | "coverage" | "renewal";
+
+export type CalEvent = {
+  id: string;
+  date: string; // YYYY-MM-DD
+  time?: string; // 24h, America/Mexico_City
+  minutes?: number;
+  title: string;
+  type: EventType;
+  client: string;
+  clientId: string;
+  project?: string;
+  where?: string;
+  href?: string;
+  staffOnly?: boolean;
+};
+
+export const eventTypeLabel: Record<EventType, string> = {
+  call: "Call",
+  milestone: "Milestone",
+  delivery: "Delivery",
+  payment: "Payment",
+  coverage: "Support",
+  renewal: "Renewal",
+};
+
+export const today = "2026-10-22";
+
+export const events: CalEvent[] = [
+  { id: "E1", date: "2026-10-23", time: "11:00", minutes: 30, title: "Kickoff: maintenance backlog", type: "call", client: "Grupo Industrial Norte", clientId: "gin", where: "Google Meet" },
+  { id: "E2", date: "2026-10-28", time: "10:00", minutes: 30, title: "Weekly check-in", type: "call", client: "Tusitio", clientId: "tusitio", project: "Campaign landing page", where: "Google Meet" },
+  { id: "E3", date: "2026-10-28", title: "Build complete", type: "milestone", client: "Tusitio", clientId: "tusitio", project: "Campaign landing page", href: "/app/projects/campaign-landing" },
+  { id: "E4", date: "2026-10-30", title: "Quote MS-1039 expires · $1,200 USD", type: "payment", client: "Grupo Industrial Norte", clientId: "gin" },
+  { id: "E5", date: "2026-10-31", time: "16:00", minutes: 45, title: "Dashboard discovery call", type: "call", client: "Lumen Analytics", clientId: "lumen", where: "Google Meet" },
+  { id: "E6", date: "2026-11-01", title: "casaverde.mx SSL renewal", type: "renewal", client: "Casa Verde Café", clientId: "casa-verde", staffOnly: true },
+  { id: "E7", date: "2026-11-04", title: "Launch", type: "delivery", client: "Tusitio", clientId: "tusitio", project: "Campaign landing page", href: "/app/projects/campaign-landing" },
+  { id: "E8", date: "2026-11-04", title: "Final balance due · $600 USD", type: "payment", client: "Tusitio", clientId: "tusitio", project: "Campaign landing page", href: "/app/billing" },
+  { id: "E9", date: "2026-11-05", time: "10:00", minutes: 30, title: "Launch review", type: "call", client: "Tusitio", clientId: "tusitio", project: "Campaign landing page", where: "Google Meet" },
+  { id: "E10", date: "2026-11-12", title: "Included support ends", type: "coverage", client: "Tusitio", clientId: "tusitio", project: "Corporate website", href: "/app/plan" },
+  { id: "E11", date: "2026-11-18", title: "Monthly plan renews", type: "renewal", client: "Casa Verde Café", clientId: "casa-verde" },
+  { id: "E12", date: "2026-10-14", time: "10:00", minutes: 30, title: "Weekly check-in", type: "call", client: "Tusitio", clientId: "tusitio", project: "Campaign landing page", where: "Google Meet" },
+  { id: "E13", date: "2026-10-16", title: "Design approved", type: "milestone", client: "Tusitio", clientId: "tusitio", project: "Campaign landing page" },
+  { id: "E14", date: "2026-11-25", time: "12:00", minutes: 30, title: "Quarterly review", type: "call", client: "Grupo Industrial Norte", clientId: "gin", where: "Google Meet" },
 ];

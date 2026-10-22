@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Instrument_Serif, Plus_Jakarta_Sans } from "next/font/google";
+import { BrandDefs } from "@/components/Jellyfish";
 import "./globals.css";
 
 const jakarta = Plus_Jakarta_Sans({
@@ -28,6 +29,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${jakarta.variable} ${accent.variable} font-sans antialiased`}>
+        <BrandDefs />
         {children}
       </body>
     </html>
