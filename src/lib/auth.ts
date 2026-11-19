@@ -1,6 +1,9 @@
 import "server-only";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { redirect } from "next/navigation";
 import { destinationFor, readSession } from "./access";
+import type { Database } from "./database.types";
+import { DEFAULT_TZ } from "./format";
 import { createClient } from "./supabase/server";
 
 // Server-side guards. The middleware already routes people, but every page and server
@@ -22,12 +25,24 @@ export async function requireStaff() {
   return { supabase, user, role: staff?.role ?? "operator" };
 }
 
-/** The client's organizations (RLS returns only their own). */
+/**
+ * Client context: the person's organizations (RLS returns only their own, by name), their
+ * primary organization (the oldest membership) and the time zone every portal page uses.
+ */
+export async function clientContext(db: SupabaseClient<Database>, userId: string) {
+  const [{ data: profile }, { data: orgs }, { data: first }] = await Promise.all([
+    db.from("profiles").select("full_name, email").eq("id", userId).single(),
+    db.from("organizations").select("id, name, timezone").order("name"),
+    db.from("memberships").select("organization_id").eq("user_id", userId).order("created_at").limit(1).maybeSingle(),
+  ]);
+  const list = orgs ?? [];
+  const primaryOrg = list.find((o) => o.id === first?.organization_id) ?? null;
+  return { profile, orgs: list, primaryOrg, tz: primaryOrg?.timezone ?? DEFAULT_TZ };
+}
+
 export async function requireClient() {
   const { supabase, user } = await requireUser();
-  const { data: profile } = await supabase.from("profiles").select("full_name, email").eq("id", user.id).single();
-  const { data: orgs } = await supabase.from("organizations").select("id, name, timezone").order("name");
-  return { supabase, user, profile, orgs: orgs ?? [] };
+  return { supabase, user, ...(await clientContext(supabase, user.id)) };
 }
 
 export const siteUrl = () => process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";

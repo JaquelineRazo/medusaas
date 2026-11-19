@@ -2,7 +2,7 @@ import Link from "next/link";
 import { PageHeader, Panel, Pill, Stat } from "@/components/ui";
 import { requireStaff } from "@/lib/auth";
 import { eventTypeLabel } from "@/lib/calendar";
-import { daysUntil, fmtDate, fmtDay, todayIn } from "@/lib/format";
+import { DEFAULT_TZ, daysUntil, fmtDate, fmtDay, todayIn } from "@/lib/format";
 import { clientLabel, ticketCode, type TicketStatus } from "@/lib/ticket-machine";
 
 type Attention = { tone: "danger" | "warning" | "gold"; text: string; href: string; cta: string };
@@ -71,7 +71,7 @@ export default async function MissionControl() {
             {week.map((e) => (
               <li key={e.id} className="flex flex-wrap items-center gap-x-4 gap-y-1 py-3 text-sm">
                 <span className="w-24 shrink-0 font-medium">{fmtDate(e.starts_at, undefined, { weekday: "short", month: "short", day: "numeric" })}</span>
-                <span className="w-16 shrink-0 text-muted">{e.all_day ? "—" : new Date(e.starts_at).toLocaleTimeString("en-US", { timeZone: "America/Mexico_City", hour: "numeric", minute: "2-digit" })}</span>
+                <span className="w-16 shrink-0 text-muted">{e.all_day ? "—" : new Date(e.starts_at).toLocaleTimeString("en-US", { timeZone: DEFAULT_TZ, hour: "numeric", minute: "2-digit" })}</span>
                 <span className="min-w-0 flex-1">{e.title} · <span className="text-muted">{e.organizations?.name}</span></span>
                 <Pill tone={e.type === "call" ? "gold" : "neutral"}>{eventTypeLabel[e.type]}</Pill>
               </li>

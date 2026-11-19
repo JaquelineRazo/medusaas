@@ -14,7 +14,7 @@ type Failure = { error: string };
 /** A client opens a request from the conversation. The team is told. */
 export async function openRequest(
   db: Db,
-  client: { userId: string; orgs: { id: string; name: string }[] },
+  client: { userId: string; primaryOrg: { id: string; name: string } | null },
   input: { kind: RequestKind; projectId: string | null; details: string },
 ): Promise<{ id: string; code: string } | Failure> {
   const details = input.details.trim().slice(0, 4000);
@@ -22,11 +22,13 @@ export async function openRequest(
   if (!Object.hasOwn(requestKinds, input.kind)) return { error: "Choose what you need." };
 
   // The project must be one the client can see; its organization is the ticket's.
-  let orgId = client.orgs[0]?.id;
+  let orgId = client.primaryOrg?.id;
+  let orgName = client.primaryOrg?.name;
   if (input.projectId) {
-    const { data: p } = await db.from("projects").select("organization_id").eq("id", input.projectId).maybeSingle();
+    const { data: p } = await db.from("projects").select("organization_id, organizations(name)").eq("id", input.projectId).maybeSingle();
     if (!p) return { error: "We couldn't find that project." };
     orgId = p.organization_id;
+    orgName = p.organizations?.name;
   }
   if (!orgId) return { error: "Your account isn't linked to a company yet." };
 
@@ -46,8 +48,7 @@ export async function openRequest(
   if (error || !t) return { error: "We couldn't send it. Please try again." };
 
   const code = ticketCode(t.number);
-  const org = client.orgs.find((o) => o.id === orgId)?.name ?? "A client";
-  await notifyStaff(`New request ${code} from ${org}: ${firstLine}`, `/console/tickets/${t.id}`);
+  await notifyStaff(`New request ${code} from ${orgName ?? "A client"}: ${firstLine}`, `/console/tickets/${t.id}`);
   return { id: t.id, code };
 }
 

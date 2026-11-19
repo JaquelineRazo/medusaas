@@ -2,12 +2,11 @@ import { Calendar } from "@/components/Calendar";
 import { ButtonLink, PageHeader } from "@/components/ui";
 import { requireClient } from "@/lib/auth";
 import { toCalEvent } from "@/lib/calendar";
-import { DEFAULT_TZ, todayIn } from "@/lib/format";
+import { todayIn } from "@/lib/format";
 
 // RLS already hides other organizations and staff-only items.
 export default async function ClientCalendar() {
-  const { supabase, orgs } = await requireClient();
-  const tz = orgs[0]?.timezone ?? DEFAULT_TZ;
+  const { supabase, tz } = await requireClient();
   const { data } = await supabase
     .from("calendar_events")
     .select("id, type, title, starts_at, all_day, minutes, location, staff_only, organization_id, organizations(name), projects(name)")

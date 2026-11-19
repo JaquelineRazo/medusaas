@@ -128,7 +128,7 @@ Server actions and pages only read the form or URL, call the module and render. 
 
 **Access decision:** in-process vitest table: signed out, client, staff with and without MFA, on `/app`, `/console`, `/console/mfa` and public paths.
 
-**Client context:** covered inside the notification tests (times come out in the right zone); no test of its own.
+**Client context:** `clientContext(db, userId)` (behind `requireClient()`) has its own small test against local Supabase: oldest membership wins, its time zone is used, Mexico City when there is no organization.
 
 **Deleted:** ticket-machine.test.ts (the module tests cover it). **Kept:** rls.test.ts (it tests database policies).
 

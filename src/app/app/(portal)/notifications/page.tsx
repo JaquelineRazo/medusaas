@@ -3,9 +3,9 @@ import { requireClient } from "@/lib/auth";
 import { listNotices, markAllRead } from "@/lib/notifications";
 
 export default async function NotificationsPage() {
-  const { supabase, user, orgs } = await requireClient();
+  const { supabase, user, tz } = await requireClient();
   // Shown as they were (unread highlighted), then marked read for the bell.
-  const items = await listNotices(supabase, { tz: orgs[0]?.timezone, limit: 100 });
+  const items = await listNotices(supabase, { tz, limit: 100 });
   await markAllRead(supabase);
   return (
     <NotificationCenter

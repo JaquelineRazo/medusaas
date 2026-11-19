@@ -3,6 +3,7 @@
 import { useActionState, useState } from "react";
 import { addEvent, addProject, createClientAccount, inviteMember, moveTicket } from "./actions";
 import type { Coverage, TicketStatus } from "@/lib/ticket-machine";
+import { DEFAULT_TZ } from "@/lib/format";
 import { clientLabel } from "@/lib/ticket-machine";
 
 const input = "mt-1 h-10 w-full rounded-xl border border-line bg-white px-3 text-sm outline-none focus:border-ink";
@@ -138,7 +139,7 @@ export function ProjectForm({ orgId }: { orgId: string }) {
 export function EventForm({ orgs }: { orgs: { id: string; name: string; timezone: string }[] }) {
   const [state, action, pending] = useActionState(addEvent, undefined);
   const [orgId, setOrgId] = useState(orgs[0]?.id ?? "");
-  const tz = orgs.find((o) => o.id === orgId)?.timezone ?? "America/Mexico_City";
+  const tz = orgs.find((o) => o.id === orgId)?.timezone ?? DEFAULT_TZ;
   return (
     <form action={action} className="space-y-4">
       <input type="hidden" name="timezone" value={tz} />

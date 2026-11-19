@@ -4,7 +4,7 @@ import { requireClient } from "@/lib/auth";
 import { hostingLabel, kindLabel, supportStatus } from "@/lib/projects";
 
 export default async function ProjectsPage() {
-  const { supabase, orgs } = await requireClient();
+  const { supabase, tz } = await requireClient();
   const { data: projects } = await supabase
     .from("projects")
     .select("id, name, kind, url, stack, hosting_owner, hosting_provider, support_ends_on")
@@ -15,7 +15,7 @@ export default async function ProjectsPage() {
       <PageHeader title="My projects" subtitle="Everything we've built with you." />
       <ul className="grid gap-4 md:grid-cols-2">
         {(projects ?? []).map((p) => {
-          const s = supportStatus(p.support_ends_on, orgs[0]?.timezone);
+          const s = supportStatus(p.support_ends_on, tz);
           return (
             <li key={p.id}>
               <Link href={`/app/projects/${p.id}`} className="block h-full rounded-3xl border border-line bg-surface p-6 hover:border-ink">

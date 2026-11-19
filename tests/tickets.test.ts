@@ -30,7 +30,7 @@ describe.skipIf(!localSupabase)("ticket lifecycle", () => {
   async function clientSetup() {
     const org = await fx.org("Acme");
     const userId = await fx.client(org);
-    return { org, userId, client: { userId, orgs: [{ id: org, name: "Acme" }] }, db: clientAs(userId) };
+    return { org, userId, client: { userId, primaryOrg: { id: org, name: "Acme" } }, db: clientAs(userId) };
   }
 
   describe("openRequest", () => {
@@ -67,6 +67,19 @@ describe.skipIf(!localSupabase)("ticket lifecycle", () => {
       expect(t).toEqual({ organization_id: org, project_id: null, priority: "normal", title: "Question: How do I add a page?" });
     });
 
+    it("names the project's organization when telling the team", async () => {
+      const { org: home, userId, db } = await clientSetup();
+      const second = await fx.org("Beta Shop");
+      await admin().from("memberships").insert({ organization_id: second, user_id: userId });
+      const project = await fx.project(second);
+      const staff = await fx.staff();
+      const res = await openRequest(db, { userId, primaryOrg: { id: home, name: "Acme" } }, { kind: "change", projectId: project, details: "New banner" });
+      if (!("id" in res)) throw new Error(res.error);
+      const { data: t } = await admin().from("tickets").select("organization_id").eq("id", res.id).single();
+      expect(t?.organization_id).toBe(second);
+      expect((await noticesOf(staff))[0].text).toBe(`New request ${res.code} from Beta Shop: New banner`);
+    });
+
     it("refuses a project from another organization", async () => {
       const { client, db } = await clientSetup();
       const foreign = await fx.project(await fx.org("Other"));
@@ -83,7 +96,7 @@ describe.skipIf(!localSupabase)("ticket lifecycle", () => {
       expect(await openRequest(db, client, { kind: "bogus" as never, projectId: null, details: "Something real" })).toEqual({
         error: "Choose what you need.",
       });
-      expect(await openRequest(db, { ...client, orgs: [] }, { kind: "issue", projectId: null, details: "Something real" })).toEqual({
+      expect(await openRequest(db, { ...client, primaryOrg: null }, { kind: "issue", projectId: null, details: "Something real" })).toEqual({
         error: "Your account isn't linked to a company yet.",
       });
     });

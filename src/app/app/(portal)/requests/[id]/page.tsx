@@ -9,8 +9,7 @@ const steps: TicketStatus[] = ["new", "evaluating", "quote_ready", "in_progress"
 
 export default async function RequestPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const { supabase, orgs } = await requireClient();
-  const tz = orgs[0]?.timezone;
+  const { supabase, tz } = await requireClient();
   const { data: t } = await supabase.from("tickets").select("*, projects(name)").eq("id", id).maybeSingle();
   if (!t) notFound();
   const { data: history } = await supabase.from("ticket_events").select("id, to_status, note, created_at").eq("ticket_id", id).order("id");

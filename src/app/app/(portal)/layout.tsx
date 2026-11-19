@@ -7,10 +7,10 @@ import { listNotices } from "@/lib/notifications";
 export const dynamic = "force-dynamic";
 
 export default async function PortalLayout({ children }: { children: React.ReactNode }) {
-  const { supabase, user, profile, orgs } = await requireClient();
+  const { supabase, user, profile, orgs, tz } = await requireClient();
   const [{ count: open }, notices] = await Promise.all([
     supabase.from("tickets").select("id", { count: "exact", head: true }).not("status", "in", "(completed,cancelled)"),
-    listNotices(supabase, { tz: orgs[0]?.timezone }),
+    listNotices(supabase, { tz }),
   ]);
   const name = profile?.full_name || user.email || "";
 
