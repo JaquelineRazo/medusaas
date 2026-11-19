@@ -173,7 +173,7 @@ Each phase leaves `npm test`, `npm run lint` and `npm run build` green and lands
 
 **F2 · Ticket lifecycle and form reading**
 1. Tests for `openRequest` and `moveTicket` (red), with the cases above.
-2. Implement the module; it absorbs ticket-machine.ts and uses Notifications.
+2. Implement the module; it uses Notifications. It lives in two files: `tickets.ts` (server-only: `openRequest`, `moveTicket`) and `ticket-machine.ts` (vocabulary and pure rules, also imported by browser code: `staffNextSteps`, `requestKinds`, labels).
 3. Form-reading module (`str`, `opt`, `isEmail`).
 4. Slim `moveTicket` and `createRequest` to: read the form, call the module, `revalidatePath`.
 5. The console ticket page uses `staffNextSteps`.

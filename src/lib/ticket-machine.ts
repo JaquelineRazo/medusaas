@@ -1,5 +1,7 @@
-// Ticket state machine. The database enforces the same rules in
-// public.ticket_transition_allowed() and public.transition_ticket(); keep both in sync.
+// Ticket vocabulary and state machine, safe for the browser. Part of the Ticket lifecycle
+// module; the server half (openRequest, moveTicket) lives in tickets.ts.
+// The database has the final word in public.ticket_transition_allowed() and
+// public.transition_ticket(); tests/transition-drift.test.ts fails if the two disagree.
 
 export type TicketStatus =
   | "new"
@@ -41,9 +43,13 @@ export function blockedReason(from: TicketStatus, to: TicketStatus, coverage: Co
   return null;
 }
 
-/** Next statuses a staff member can choose from the UI. */
-export function nextSteps(from: TicketStatus, coverage: Coverage): TicketStatus[] {
-  return transitions[from].filter((to) => blockedReason(from, to, coverage) === null);
+/**
+ * Statuses the console offers. From assessment it includes "in_progress" because coverage
+ * is chosen in the same form (moveTicket still refuses it unless the work is covered).
+ * awaiting_payment → in_progress belongs to the payment webhook, never to a person.
+ */
+export function staffNextSteps(from: TicketStatus): TicketStatus[] {
+  return transitions[from].filter((to) => !(from === "awaiting_payment" && to === "in_progress"));
 }
 
 // What the client sees (COPY.md "Client-facing status labels").
@@ -59,3 +65,7 @@ export const clientLabel: Record<TicketStatus, string> = {
 };
 
 export const ticketCode = (n: number) => `MS-${n}`;
+
+// What a client can ask for in a conversation; the label prefixes the ticket title.
+export const requestKinds = { issue: "Issue", change: "Change", new: "New", question: "Question" } as const;
+export type RequestKind = keyof typeof requestKinds;
