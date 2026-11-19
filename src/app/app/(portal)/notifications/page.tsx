@@ -1,13 +1,15 @@
 import { NotificationCenter } from "@/components/NotificationCenter";
 import { requireClient } from "@/lib/auth";
-import { fmtDateTime } from "@/lib/format";
+import { listNotices, markAllRead } from "@/lib/notifications";
 
 export default async function NotificationsPage() {
   const { supabase, user, orgs } = await requireClient();
-  const { data } = await supabase.from("notifications").select("text, created_at, read_at").order("created_at", { ascending: false }).limit(100);
+  // Shown as they were (unread highlighted), then marked read for the bell.
+  const items = await listNotices(supabase, { tz: orgs[0]?.timezone, limit: 100 });
+  await markAllRead(supabase);
   return (
     <NotificationCenter
-      items={(data ?? []).map((n) => ({ text: n.text, when: fmtDateTime(n.created_at, orgs[0]?.timezone), unread: !n.read_at }))}
+      items={items}
       email={user.email ?? ""}
       topics={[
         { label: "Quotes and payments", hint: "A quote is ready, a payment is confirmed or due.", required: true },

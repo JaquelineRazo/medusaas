@@ -10,7 +10,7 @@ export function NotificationCenter({ items, email, topics }: { items: Notice[]; 
       <PageHeader title="Notifications" subtitle={`Everything here is also sent to ${email}.`} />
       <ul className="divide-y divide-line rounded-3xl border border-line bg-surface">
         {items.map((n) => (
-          <li key={n.text} className="flex items-start gap-3 px-5 py-4">
+          <li key={n.id} className="flex items-start gap-3 px-5 py-4">
             <span
               aria-hidden="true"
               className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${n.unread ? "bg-sunshine" : "bg-transparent"}`}

@@ -1,13 +1,15 @@
 import { NotificationCenter } from "@/components/NotificationCenter";
 import { requireStaff } from "@/lib/auth";
-import { fmtDateTime } from "@/lib/format";
+import { listNotices, markAllRead } from "@/lib/notifications";
 
 export default async function AdminNotificationsPage() {
   const { supabase, user } = await requireStaff();
-  const { data } = await supabase.from("notifications").select("text, created_at, read_at").order("created_at", { ascending: false }).limit(100);
+  // Shown as they were (unread highlighted), then marked read for the bell.
+  const items = await listNotices(supabase, { limit: 100 });
+  await markAllRead(supabase);
   return (
     <NotificationCenter
-      items={(data ?? []).map((n) => ({ text: n.text, when: fmtDateTime(n.created_at), unread: !n.read_at }))}
+      items={items}
       email={user.email ?? ""}
       topics={[
         { label: "Payments", hint: "Deposits and payments confirmed by Stripe.", required: true },

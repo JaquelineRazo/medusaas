@@ -1,7 +1,7 @@
 "use server";
 
 import { requireClient } from "@/lib/auth";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { notifyStaff } from "@/lib/notifications";
 import { ticketCode } from "@/lib/ticket-machine";
 
 const kinds = { issue: "Issue", change: "Change", new: "New", question: "Question" } as const;
@@ -37,13 +37,7 @@ export async function createRequest(input: { kind: Kind; projectId: string | nul
     .single();
   if (error || !t) return { error: "We couldn't send it. Please try again." };
 
-  // Let the team know (clients can't write notifications themselves).
-  const admin = createAdminClient();
-  const { data: staff } = await admin.from("staff").select("user_id");
   const org = orgs.find((o) => o.id === orgId)?.name ?? "A client";
-  if (staff?.length)
-    await admin.from("notifications").insert(
-      staff.map((s) => ({ user_id: s.user_id, text: `New request ${ticketCode(t.number)} from ${org}: ${firstLine}`.slice(0, 300), link: `/console/tickets/${t.id}` })),
-    );
+  await notifyStaff(`New request ${ticketCode(t.number)} from ${org}: ${firstLine}`, `/console/tickets/${t.id}`);
   return { id: t.id, code: ticketCode(t.number) };
 }

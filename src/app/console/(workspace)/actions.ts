@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { requireStaff, siteUrl } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { notifyOrgMembers } from "@/lib/notifications";
 import type { Database } from "@/lib/database.types";
 import { blockedReason, clientLabel, ticketCode, type Coverage, type TicketStatus } from "@/lib/ticket-machine";
 
@@ -138,12 +139,7 @@ export async function moveTicket(_: State, f: FormData): Promise<State> {
   const { error } = await supabase.rpc("transition_ticket", { p_ticket: id, p_to: to, p_note: opt(f, "note", 2000) ?? undefined, p_coverage: coverage ?? undefined });
   if (error) return { error: error.message };
 
-  // Tell the client's people (staff may write notifications).
-  const { data: members } = await supabase.from("memberships").select("user_id").eq("organization_id", t.organization_id);
-  if (members?.length)
-    await supabase.from("notifications").insert(
-      members.map((m) => ({ user_id: m.user_id, text: `${ticketCode(t.number)} is now: ${clientLabel[to]}.`, link: `/app/requests/${id}` })),
-    );
+  await notifyOrgMembers(supabase, t.organization_id, `${ticketCode(t.number)} is now: ${clientLabel[to]}.`, `/app/requests/${id}`);
   revalidatePath(`/console/tickets/${id}`);
   return { ok: true };
 }

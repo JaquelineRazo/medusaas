@@ -1,17 +1,17 @@
 import type { Metadata } from "next";
 import { Shell, type NavItem } from "@/components/Shell";
 import { requireStaff } from "@/lib/auth";
-import { fmtDateTime } from "@/lib/format";
+import { listNotices } from "@/lib/notifications";
 
 export const metadata: Metadata = { title: "Admin Workspace · meduSAAS", robots: { index: false } };
 export const dynamic = "force-dynamic";
 
 export default async function ConsoleLayout({ children }: { children: React.ReactNode }) {
   const { supabase, user, role } = await requireStaff();
-  const [{ data: profile }, { count: toAssess }, { data: notes }] = await Promise.all([
+  const [{ data: profile }, { count: toAssess }, notices] = await Promise.all([
     supabase.from("profiles").select("full_name").eq("id", user.id).single(),
     supabase.from("tickets").select("id", { count: "exact", head: true }).in("status", ["new", "evaluating"]),
-    supabase.from("notifications").select("text, created_at, read_at").order("created_at", { ascending: false }).limit(20),
+    listNotices(supabase, {}),
   ]);
   const name = profile?.full_name || user.email || "";
 
@@ -34,7 +34,7 @@ export default async function ConsoleLayout({ children }: { children: React.Reac
       badge="Admin Workspace"
       user={{ initial: name[0]?.toUpperCase() ?? "?", name, role: role === "superadmin" ? "Superadmin" : "Operator" }}
       notifications={{
-        items: (notes ?? []).map((n) => ({ text: n.text, when: fmtDateTime(n.created_at), unread: !n.read_at })),
+        items: notices,
         email: user.email ?? "",
         href: "/console/notifications",
       }}
