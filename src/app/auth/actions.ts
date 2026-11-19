@@ -1,7 +1,8 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { safeNext, siteUrl } from "@/lib/auth";
+import { landingFor, readSession } from "@/lib/access";
+import { siteUrl } from "@/lib/auth";
 import { str } from "@/lib/form";
 import { createClient } from "@/lib/supabase/server";
 
@@ -14,8 +15,8 @@ export async function signIn(_: FormState, form: FormData): Promise<FormState> {
   const { error } = await supabase.auth.signInWithPassword({ email, password });
   // Same message for every failure: never reveal whether an email has an account.
   if (error) return { error: "That email and password don't match. Try again or reset your password." };
-  const { data: isStaff } = await supabase.rpc("staff_pending_mfa");
-  redirect(isStaff ? "/console/mfa" : safeNext(str(form, "next", 500), "/app"));
+  const { session } = await readSession(supabase);
+  redirect(landingFor(session, str(form, "next", 500)));
 }
 
 export async function signOut() {
@@ -42,6 +43,6 @@ export async function setPassword(_: FormState, form: FormData): Promise<FormSta
   if (!user) return { error: "Your link expired. Ask us for a new invitation or reset your password." };
   const { error } = await supabase.auth.updateUser({ password });
   if (error) return { error: error.message };
-  const { data: isStaff } = await supabase.rpc("staff_pending_mfa");
-  redirect(isStaff ? "/console/mfa" : "/app");
+  const { session } = await readSession(supabase);
+  redirect(landingFor(session, null));
 }

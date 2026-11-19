@@ -1,8 +1,10 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { destinationFor, readSession } from "@/lib/access";
 
 // Refreshes the session on every request and guards the two private areas:
-// /app (clients) and /console (staff, always with MFA). MED-006.
+// /app (clients) and /console (staff, always with MFA). MED-006. The rule itself
+// lives in destinationFor(); this only reads the session and obeys.
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({ request });
   const supabase = createServerClient(
@@ -20,32 +22,13 @@ export async function middleware(request: NextRequest) {
     },
   );
 
-  const { data: { user } } = await supabase.auth.getUser();
-  const path = request.nextUrl.pathname;
-  const isApp = path === "/app" || path.startsWith("/app/");
-  const isConsole = path === "/console" || path.startsWith("/console/");
-  if (!isApp && !isConsole) return response;
+  const { session } = await readSession(supabase);
+  const to = destinationFor(session, request.nextUrl.pathname + request.nextUrl.search);
+  if (to === "allow") return response;
 
-  const go = (to: string) => {
-    const url = request.nextUrl.clone();
-    url.pathname = to;
-    url.search = "";
-    if (to === "/sign-in" && isApp) url.searchParams.set("next", path + request.nextUrl.search);
-    const redirect = NextResponse.redirect(url);
-    for (const c of response.cookies.getAll()) redirect.cookies.set(c);
-    return redirect;
-  };
-
-  if (!user) return go("/sign-in");
-
-  const { data: isStaff } = await supabase.rpc("staff_pending_mfa");
-  if (isApp) return isStaff ? go("/console") : response;
-
-  // /console: staff only, and only after the second factor.
-  if (!isStaff) return go("/app");
-  if (path.startsWith("/console/mfa")) return response;
-  const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
-  return aal?.currentLevel === "aal2" ? response : go("/console/mfa");
+  const redirect = NextResponse.redirect(new URL(to, request.url));
+  for (const c of response.cookies.getAll()) redirect.cookies.set(c);
+  return redirect;
 }
 
 export const config = {
