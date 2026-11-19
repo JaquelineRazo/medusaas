@@ -9,8 +9,18 @@ Live at https://medusaas.razzobusiness.com.
 npm install
 cp .env.example .env.local   # fill in the values (never commit .env.local)
 npm run dev                  # http://localhost:3000
-npm test                     # state machine + RLS tests (RLS needs SUPABASE_DB_* in .env.local)
+npm test                     # unit tests; module tests need local Supabase, RLS tests need SUPABASE_DB_*
 ```
+
+**Module tests** run against a local Supabase in Docker, as real users through RLS, and are skipped when it isn't running:
+
+```bash
+npm run db:start             # first run pulls the images; applies supabase/migrations/
+npm test
+npm run db:stop
+```
+
+Helpers live in `tests/support/` (`clientAs(userId, aal)`, `fixtures()`, `admin()`). See `docs/architecture-plan.md`.
 
 - Database: `supabase/migrations/` (apply with `npx supabase db push`). Auth settings: `supabase/config.toml` (`npx supabase config push`).
 - Access: clients get a one-time invitation link from Client 360 and choose their own password. Staff are listed in `public.staff` (SQL only) and always pass MFA.

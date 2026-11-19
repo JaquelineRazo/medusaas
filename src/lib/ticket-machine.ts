@@ -24,6 +24,11 @@ const transitions: Record<TicketStatus, TicketStatus[]> = {
   cancelled: [],
 };
 
+export const ticketStatuses = Object.keys(transitions) as TicketStatus[];
+
+/** Whether the state machine has this edge at all (coverage and payment rules aside). */
+export const isTransition = (from: TicketStatus, to: TicketStatus) => transitions[from].includes(to);
+
 const covered: Coverage[] = ["included", "plan", "warranty"];
 
 /** Why a staff member can't move a ticket, or null if they can. */
