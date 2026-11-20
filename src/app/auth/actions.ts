@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { landingFor, readSession } from "@/lib/access";
 import { siteUrl } from "@/lib/auth";
 import { str } from "@/lib/form";
+import { choosePassword } from "@/lib/passwords";
 import { createClient } from "@/lib/supabase/server";
 
 export type FormState = { error?: string; sent?: boolean } | undefined;
@@ -35,14 +36,13 @@ export async function requestReset(_: FormState, form: FormData): Promise<FormSt
 }
 
 export async function setPassword(_: FormState, form: FormData): Promise<FormState> {
-  const password = String(form.get("password") ?? "");
-  if (password.length < 10) return { error: "Use at least 10 characters." };
-  if (password !== form.get("confirm")) return { error: "The two passwords don't match." };
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { error: "Your link expired. Ask us for a new invitation or reset your password." };
-  const { error } = await supabase.auth.updateUser({ password });
-  if (error) return { error: error.message };
+  const res = await choosePassword(supabase, {
+    password: String(form.get("password") ?? ""),
+    confirm: String(form.get("confirm") ?? ""),
+    code: str(form, "code", 12),
+  });
+  if ("error" in res) return { error: res.error };
   const { session } = await readSession(supabase);
   redirect(landingFor(session, null));
 }
