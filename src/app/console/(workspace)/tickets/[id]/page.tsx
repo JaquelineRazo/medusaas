@@ -4,7 +4,7 @@ import { StatusBadge } from "@/components/StatusBadge";
 import { PageHeader, Panel, Pill } from "@/components/ui";
 import { requireStaff } from "@/lib/auth";
 import { fmtDateTime } from "@/lib/format";
-import { clientLabel, nextSteps, ticketCode, type TicketStatus } from "@/lib/ticket-machine";
+import { clientLabel, staffNextSteps, ticketCode } from "@/lib/ticket-machine";
 import { MoveTicketForm } from "../../forms";
 
 export default async function TicketPage({ params }: { params: Promise<{ id: string }> }) {
@@ -13,11 +13,7 @@ export default async function TicketPage({ params }: { params: Promise<{ id: str
   const { data: t } = await supabase.from("tickets").select("*, organizations(id, name), projects(name), profiles(full_name, email)").eq("id", id).maybeSingle();
   if (!t) notFound();
   const { data: history } = await supabase.from("ticket_events").select("id, from_status, to_status, note, created_at, profiles(full_name)").eq("ticket_id", id).order("id");
-  // From assessment, "In progress" is offered because coverage is chosen in the same form;
-  // the server (and the database) still refuse it unless the work is covered.
-  // awaiting_payment → in_progress belongs to the payment webhook, never to a person.
-  const steps: TicketStatus[] =
-    t.status === "evaluating" ? ["quote_ready", "in_progress", "cancelled"] : nextSteps(t.status, t.coverage);
+  const steps = staffNextSteps(t.status);
 
   return (
     <div className="mx-auto max-w-6xl">

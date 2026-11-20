@@ -2,18 +2,17 @@ import Link from "next/link";
 import { Mavi } from "@/components/Jellyfish";
 import { Shell, type NavItem } from "@/components/Shell";
 import { requireClient } from "@/lib/auth";
-import { fmtDateTime } from "@/lib/format";
+import { listNotices } from "@/lib/notifications";
 
 export const dynamic = "force-dynamic";
 
 export default async function PortalLayout({ children }: { children: React.ReactNode }) {
-  const { supabase, user, profile, orgs } = await requireClient();
-  const [{ count: open }, { data: notes }] = await Promise.all([
+  const { supabase, user, profile, orgs, tz } = await requireClient();
+  const [{ count: open }, notices] = await Promise.all([
     supabase.from("tickets").select("id", { count: "exact", head: true }).not("status", "in", "(completed,cancelled)"),
-    supabase.from("notifications").select("text, created_at, read_at").order("created_at", { ascending: false }).limit(20),
+    listNotices(supabase, { tz }),
   ]);
   const name = profile?.full_name || user.email || "";
-  const tz = orgs[0]?.timezone;
 
   const nav: NavItem[] = [
     { href: "/app", label: "Home" },
@@ -32,7 +31,7 @@ export default async function PortalLayout({ children }: { children: React.React
       root="/app"
       user={{ initial: name[0]?.toUpperCase() ?? "?", name, role: orgs.map((o) => o.name).join(", ") }}
       notifications={{
-        items: (notes ?? []).map((n) => ({ text: n.text, when: fmtDateTime(n.created_at, tz), unread: !n.read_at })),
+        items: notices,
         email: user.email ?? "",
         href: "/app/notifications",
       }}

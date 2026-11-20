@@ -6,7 +6,7 @@ import { fmtDateTime } from "@/lib/format";
 import { ticketCode } from "@/lib/ticket-machine";
 
 export default async function RequestsPage() {
-  const { supabase, orgs } = await requireClient();
+  const { supabase, tz } = await requireClient();
   const { data: tickets } = await supabase
     .from("tickets")
     .select("id, number, title, status, updated_at, projects(name)")
@@ -28,7 +28,7 @@ export default async function RequestsPage() {
                   <span className="block font-medium">{t.title}</span>
                   {t.projects?.name && <span className="text-muted">{t.projects.name}</span>}
                 </span>
-                <span className="text-muted">{fmtDateTime(t.updated_at, orgs[0]?.timezone)}</span>
+                <span className="text-muted">{fmtDateTime(t.updated_at, tz)}</span>
                 <StatusBadge status={t.status} />
               </Link>
             </li>

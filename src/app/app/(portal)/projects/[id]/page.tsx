@@ -9,8 +9,7 @@ import { ticketCode } from "@/lib/ticket-machine";
 
 export default async function ProjectPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const { supabase, orgs } = await requireClient();
-  const tz = orgs[0]?.timezone;
+  const { supabase, tz } = await requireClient();
   // RLS returns nothing for a project outside the client's organizations.
   const { data: p } = await supabase.from("projects").select("*").eq("id", id).maybeSingle();
   if (!p) notFound();

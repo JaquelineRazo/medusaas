@@ -16,14 +16,14 @@ const options = [
 ];
 
 export default async function PlanPage() {
-  const { supabase, orgs } = await requireClient();
+  const { supabase, tz } = await requireClient();
   const { data: projects } = await supabase.from("projects").select("id, name, support_ends_on").neq("status", "archived").order("created_at");
   return (
     <div className="mx-auto max-w-5xl">
       <PageHeader title="My plan" subtitle="How each of your projects is covered." />
       <ul className="grid gap-4 md:grid-cols-2">
         {(projects ?? []).map((p) => {
-          const s = supportStatus(p.support_ends_on, orgs[0]?.timezone);
+          const s = supportStatus(p.support_ends_on, tz);
           return (
             <li key={p.id} className="rounded-3xl border border-line bg-surface p-6">
               <p className="font-semibold">{p.name}</p>

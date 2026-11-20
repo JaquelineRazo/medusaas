@@ -7,8 +7,7 @@ import { kindLabel, supportStatus } from "@/lib/projects";
 import { ticketCode } from "@/lib/ticket-machine";
 
 export default async function ClientHome() {
-  const { supabase, profile, orgs } = await requireClient();
-  const tz = orgs[0]?.timezone;
+  const { supabase, profile, tz } = await requireClient();
   const [{ data: projects }, { data: tickets }, { data: calls }] = await Promise.all([
     supabase.from("projects").select("id, name, kind, url, stack, support_ends_on").neq("status", "archived").order("created_at"),
     supabase.from("tickets").select("id, number, title, status, updated_at").order("updated_at", { ascending: false }).limit(5),

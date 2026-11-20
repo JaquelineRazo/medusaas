@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useState, useTransition } from "react";
 import { Bubble, Card, ChatHeader, Primary, Secondary } from "@/components/chat";
-import { createRequest, type Kind } from "./actions";
+import type { RequestKind as Kind } from "@/lib/ticket-machine";
+import { createRequest } from "./actions";
 
 const kindOptions: { kind: Kind; label: string; ask: string }[] = [
   { kind: "issue", label: "Report an issue", ask: "Sorry about that. What's happening? Tell me what you see and where." },

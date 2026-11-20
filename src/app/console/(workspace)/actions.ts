@@ -4,11 +4,12 @@ import { revalidatePath } from "next/cache";
 import { requireStaff, siteUrl } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { Database } from "@/lib/database.types";
-import { blockedReason, clientLabel, ticketCode, type Coverage, type TicketStatus } from "@/lib/ticket-machine";
+import { isEmail, opt, str } from "@/lib/form";
+import { DEFAULT_TZ } from "@/lib/format";
+import type { Coverage, TicketStatus } from "@/lib/ticket-machine";
+import * as tickets from "@/lib/tickets";
 
 type State = { error?: string; ok?: boolean; link?: string; email?: string } | undefined;
-const str = (f: FormData, k: string, max = 200) => String(f.get(k) ?? "").trim().slice(0, max);
-const opt = (f: FormData, k: string, max = 200) => str(f, k, max) || null;
 
 /**
  * Creates (or finds) the auth user and returns a one-time link to choose a password.
@@ -48,11 +49,11 @@ function projectFields(f: FormData) {
 export async function createClientAccount(_: State, f: FormData): Promise<State> {
   const { supabase } = await requireStaff();
   const email = str(f, "email").toLowerCase();
-  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return { error: "Check the email address." };
+  if (!isEmail(email)) return { error: "Check the email address." };
 
   const { data: org, error: e1 } = await supabase
     .from("organizations")
-    .insert({ name: str(f, "org_name", 120), industry: opt(f, "industry"), city: opt(f, "city"), timezone: str(f, "timezone") || "America/Mexico_City" })
+    .insert({ name: str(f, "org_name", 120), industry: opt(f, "industry"), city: opt(f, "city"), timezone: str(f, "timezone") || DEFAULT_TZ })
     .select("id")
     .single();
   if (e1 || !org) return { error: `Couldn't create the client: ${e1?.message}` };
@@ -75,7 +76,7 @@ export async function inviteMember(_: State, f: FormData): Promise<State> {
   const { supabase } = await requireStaff();
   const orgId = str(f, "organization_id");
   const email = str(f, "email").toLowerCase();
-  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return { error: "Check the email address." };
+  if (!isEmail(email)) return { error: "Check the email address." };
   try {
     const { userId, link } = await invitationLink(email, opt(f, "full_name", 120));
     const { error } = await supabase
@@ -103,7 +104,7 @@ export async function addEvent(_: State, f: FormData): Promise<State> {
   const orgId = str(f, "organization_id");
   const date = str(f, "date", 10);
   const time = str(f, "time", 5);
-  const tz = str(f, "timezone") || "America/Mexico_City";
+  const tz = str(f, "timezone") || DEFAULT_TZ;
   if (!orgId || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return { error: "Choose a client and a date." };
   // Wall-clock time in the client's zone → UTC instant.
   const { data: startsAt, error: tzErr } = await supabase.rpc("local_to_utc", { p_local: `${date} ${time || "12:00"}`, p_tz: tz });
@@ -127,23 +128,14 @@ export async function addEvent(_: State, f: FormData): Promise<State> {
 
 export async function moveTicket(_: State, f: FormData): Promise<State> {
   const { supabase } = await requireStaff();
-  const id = str(f, "ticket_id");
-  const to = str(f, "to") as TicketStatus;
-  const coverage = (str(f, "coverage") || null) as Coverage | null;
-  const { data: t } = await supabase.from("tickets").select("status, coverage, number, organization_id").eq("id", id).single();
-  if (!t) return { error: "Ticket not found." };
-  const reason = blockedReason(t.status, to, coverage ?? t.coverage);
-  if (reason) return { error: reason };
-
-  const { error } = await supabase.rpc("transition_ticket", { p_ticket: id, p_to: to, p_note: opt(f, "note", 2000) ?? undefined, p_coverage: coverage ?? undefined });
-  if (error) return { error: error.message };
-
-  // Tell the client's people (staff may write notifications).
-  const { data: members } = await supabase.from("memberships").select("user_id").eq("organization_id", t.organization_id);
-  if (members?.length)
-    await supabase.from("notifications").insert(
-      members.map((m) => ({ user_id: m.user_id, text: `${ticketCode(t.number)} is now: ${clientLabel[to]}.`, link: `/app/requests/${id}` })),
-    );
-  revalidatePath(`/console/tickets/${id}`);
+  const ticketId = str(f, "ticket_id");
+  const res = await tickets.moveTicket(supabase, {
+    ticketId,
+    to: str(f, "to") as TicketStatus,
+    coverage: opt(f, "coverage") as Coverage | null,
+    note: opt(f, "note", 2000),
+  });
+  if ("error" in res) return res;
+  revalidatePath(`/console/tickets/${ticketId}`);
   return { ok: true };
 }

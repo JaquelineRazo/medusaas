@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import type { Notice } from "@/lib/notifications";
 
-export type Notice = { text: string; when: string; unread: boolean };
+export type { Notice };
 
 // Bell next to the user name. Every notice here is also sent to `email`.
 export function NotificationBell({ items, email, href }: { items: Notice[]; email: string; href: string }) {
@@ -59,7 +60,7 @@ export function NotificationBell({ items, email, href }: { items: Notice[]; emai
           </div>
           <ul className="max-h-80 divide-y divide-line overflow-y-auto">
             {items.map((n) => (
-              <li key={n.text} className="flex gap-3 px-5 py-3">
+              <li key={n.id} className="flex gap-3 px-5 py-3">
                 <span
                   aria-hidden="true"
                   className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${n.unread ? "bg-sunshine" : "bg-transparent"}`}
